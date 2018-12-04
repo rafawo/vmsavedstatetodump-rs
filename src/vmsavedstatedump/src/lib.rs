@@ -1,3 +1,6 @@
+pub mod vmsavedstatedumpdefs;
+pub mod vmsavedstatedump;
+
 #[cfg(test)]
 mod tests {
     #[test]
