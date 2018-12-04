@@ -3,7 +3,7 @@ Rust wrapper of VmSavedStateDump
 
 ## Overview
 
-This project is a collection of Rust libraries that wrap functionality exposed by [VmSavedStateDumpProvider](https://docs.microsoft.com/en-us/virtualization/api/vm-dump-provider/vm-dump-provider).
+This project provides a Rust abstraction of [VmSavedStateDumpProvider](https://docs.microsoft.com/en-us/virtualization/api/vm-dump-provider/vm-dump-provider) APIs.
 
 VmSavedStateDumpProvider APIs are part of the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk).
 
