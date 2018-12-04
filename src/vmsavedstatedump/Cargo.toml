@@ -1,0 +1,6 @@
+[package]
+name = "vmsavedstatedump"
+version = "0.1.0"
+authors = ["Rafael Alcaraz Mercado <ramerc@microsoft.com>"]
+
+[dependencies]
