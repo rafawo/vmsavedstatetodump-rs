@@ -14,7 +14,7 @@ For this wrapper to build properly, the following requirements need to be met by
 - Windows 10 SDK version **10.0.17763.132**.
 - **amd64** architecture.
 
-## Files in the SDK
+## Wrapped Windows 10 SDK APIs
 
 **_Note: The file paths are based on the default installation path `c:\Program Files (x86)\Windows Kits\10`._**
 
