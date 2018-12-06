@@ -1,7 +1,7 @@
 //! This file contains the interface definitions for the VmSavedState Dump Provider APIs.
 
 use crate::vmsavedstatedumpdefs::*;
-use winapi::shared::ntdef::{HRESULT, LPCWSTR, LPWSTR, PVOID};
+use crate::windefs::*;
 
 #[link(name = "vmsavedstatedumpprovider")]
 extern "C" {
@@ -28,15 +28,15 @@ extern "C" {
     ///
     /// * `S_OK` - The full path(s) to the saved state file were returned successfully.
     /// * `E_OUTOFMEMORY` - There was insufficient memory to return the full path(s).
-    /// * `HRESULT` - Other HRESULT failure codes might be returned.
+    /// * `HResult` - Other HResult failure codes might be returned.
     ///
     pub fn LocateSavedStateFiles(
-        VmName: LPCWSTR,
-        SnapshotName: LPCWSTR,
-        BinPath: *mut LPWSTR,
-        VsvPath: *mut LPWSTR,
-        VmrsPath: *mut LPWSTR,
-    ) -> HRESULT;
+        VmName: LPCWStr,
+        SnapshotName: LPCWStr,
+        BinPath: *mut LPWStr,
+        VsvPath: *mut LPWStr,
+        VmrsPath: *mut LPWStr,
+    ) -> HResult;
 
     /// Loads the given saved state file and creates an instance of VmSavedStateDump.
     /// This instance can be referenced on the other methods with the returned UINT64 Id.
@@ -48,12 +48,12 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn LoadSavedStateFile(
-        VmrsFile: LPCWSTR,
-        VmSavedStateDumpHandle: *mut VM_SAVED_STATE_DUMP_HANDLE,
-    ) -> HRESULT;
+        VmrsFile: LPCWStr,
+        VmSavedStateDumpHandle: *mut VmSavedStateDumpHandle,
+    ) -> HResult;
 
     /// Opens the given saved state file in read-write exclusive mode so that it applies any pending
     /// replay logs to the contents. This method doesn't loads the saved state file into the library
@@ -65,9 +65,9 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
-    pub fn ApplyPendingSavedStateFileReplayLog(VmrsFile: LPCWSTR) -> HRESULT;
+    pub fn ApplyPendingSavedStateFileReplayLog(VmrsFile: LPCWStr) -> HResult;
 
     /// Loads the given saved state files and creates an instance of VmSavedStateDump.
     /// This instance can be referenced on the other methods with the returned UINT64 Id.
@@ -80,13 +80,13 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn LoadSavedStateFiles(
-        BinFile: LPCWSTR,
-        VsvFile: LPCWSTR,
-        VmSavedStateDumpHandle: *mut VM_SAVED_STATE_DUMP_HANDLE,
-    ) -> HRESULT;
+        BinFile: LPCWStr,
+        VsvFile: LPCWStr,
+        VmSavedStateDumpHandle: *mut VmSavedStateDumpHandle,
+    ) -> HResult;
 
     /// Releases the given VmSavedStateDump provider that matches the supplied ID.
     /// Releasing the provider releases the locks to the saved state files.
@@ -98,9 +98,9 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
-    pub fn ReleaseSavedStateFiles(VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE) -> HRESULT;
+    pub fn ReleaseSavedStateFiles(VmSavedStateDumpHandle: VmSavedStateDumpHandle) -> HResult;
 
     /// Queries for the Virtual Processor count for a given VmSavedStateDump.
     ///
@@ -111,12 +111,12 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GetVpCount(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpCount: *mut u32,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Queries for the current Architecture/ISA the virtual processor was running at the time the
     /// saved state file was generated.
@@ -129,13 +129,13 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GetArchitecture(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpId: u32,
         Architecture: *mut VirtualProcessArch,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Queries for a specific register value for a given VP in a VmSavedStateDump.
     /// Callers must specify architecture and register ID in parameter Register, and this function
@@ -149,13 +149,13 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GetRegisterValue(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpId: u32,
         Register: *mut VirtualProcessorRegister,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Queries for the current Paging Mode in use by the virtual processor at the time the
     /// saved state file was generated.
@@ -168,13 +168,13 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GetPagingMode(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpId: u32,
         PagingMode: *mut PagingMode,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Reads from the saved state file the given guest physical address range and then
     /// it is written into the supplied buffer.
@@ -190,15 +190,15 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn ReadGuestPhysicalAddress(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
-        PhysicalAddress: GUEST_PHYSICAL_ADDRESS,
-        Buffer: *mut PVOID,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        PhysicalAddress: GuestPhysicalAddress,
+        Buffer: *mut PVoid,
         BufferSize: u32,
         BytesRead: *mut u32,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Translates a virtual address to a pysical address using information found in the
     /// guest's memory and processor's state.
@@ -212,14 +212,14 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GuestVirtualAddressToPhysicalAddress(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpId: u32,
-        VirtualAddress: GUEST_VIRTUAL_ADDRESS,
-        PhysicalAddress: *mut GUEST_PHYSICAL_ADDRESS,
-    ) -> HRESULT;
+        VirtualAddress: GuestVirtualAddress,
+        PhysicalAddress: *mut GuestPhysicalAddress,
+    ) -> HResult;
 
     /// Returns the layout of the physical memory of the guest. This information contains the chunks of memory
     /// with consecutive pages and from where each one starts. If the supplied count is less than the amount
@@ -238,14 +238,14 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GetGuestPhysicalMemoryChunks(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         MemoryChunkPageSize: *mut u64,
         MemoryChunks: *mut GpaMemoryChunk,
         MemoryChunkCount: *mut u64,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Translates the given guest physical address to a raw saved memory offset. This is specially useful
     /// if callers need to read a memory range directly from all of the guest's saved memory starting
@@ -260,13 +260,13 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GuestPhysicalAddressToRawSavedMemoryOffset(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
-        PhysicalAddress: GUEST_PHYSICAL_ADDRESS,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        PhysicalAddress: GuestPhysicalAddress,
         RawSavedMemoryOffset: *mut u64,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Reads raw memory from the saved state file. This function reads raw memory from the saved state file
     /// as if it were a flat memory layout, regardless of the guest memory layout.
@@ -282,15 +282,15 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn ReadGuestRawSavedMemory(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         RawSavedMemoryOffset: u64,
-        Buffer: *mut PVOID,
+        Buffer: *mut PVoid,
         BufferSize: u32,
         BytesRead: *mut u32,
-    ) -> HRESULT;
+    ) -> HResult;
 
     /// Returns the size in bytes of the saved memory for a given VM saved state file.
     ///
@@ -301,11 +301,11 @@ extern "C" {
     ///
     /// # Returns
     ///
-    /// * `HRESULT`.
+    /// * `HResult`.
     ///
     pub fn GetGuestRawSavedMemorySize(
-        VmSavedStateDumpHandle: VM_SAVED_STATE_DUMP_HANDLE,
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         GuestRawSavedMemorySize: *mut u64,
-    ) -> HRESULT;
+    ) -> HResult;
 
 }

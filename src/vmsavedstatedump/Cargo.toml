@@ -11,4 +11,4 @@ keywords = ["windows", "vmsavedstatedump", "hyper-v", "vmrs file"]
 build = "build.rs"
 
 [dependencies]
-winapi = { version = "0.3.6", features = ["minwindef"] }
+libc = "0.2.44"

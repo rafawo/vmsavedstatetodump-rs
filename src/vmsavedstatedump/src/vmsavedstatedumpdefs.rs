@@ -1,16 +1,10 @@
 //! This file contains the VmSavedState Dump Provider definitions used by the APIs.
 
-use winapi::shared::minwindef::DWORD;
-use winapi::shared::ntdef::VOID;
+use crate::windefs::*;
 
-#[allow(non_camel_case_types)]
-pub type VM_SAVED_STATE_DUMP_HANDLE = *mut VOID;
-
-#[allow(non_camel_case_types)]
-pub type GUEST_VIRTUAL_ADDRESS = u64;
-
-#[allow(non_camel_case_types)]
-pub type GUEST_PHYSICAL_ADDRESS = u64;
+pub type VmSavedStateDumpHandle = *mut Void;
+pub type GuestVirtualAddress = u64;
+pub type GuestPhysicalAddress = u64;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -258,7 +252,7 @@ pub enum RegisterIdx64 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union RegisterRawId {
-    pub register_id: DWORD,
+    pub register_id: DWord,
     pub register_id_x86: RegisterIdx86,
     pub register_id_x64: RegisterIdx64,
 }
