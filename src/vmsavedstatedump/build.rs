@@ -1,5 +1,5 @@
 //! Build script that takes care of making sure VmSavedStateDumpProvider.lib is linked
-//! to the project when built.
+//! to the crate when built.
 //!
 //! This script relies on the environment variables `WIN10SDK_PATH` and `WIN10SDK_VERSION`.
 //! `WIN10SDK_PATH` defaults to `c:\Program Files (x86)\Windows Kits\10` if not set.
