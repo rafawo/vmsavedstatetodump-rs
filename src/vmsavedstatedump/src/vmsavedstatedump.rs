@@ -113,10 +113,8 @@ extern "C" {
     ///
     /// * `HResult`.
     ///
-    pub fn GetVpCount(
-        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
-        VpCount: *mut u32,
-    ) -> HResult;
+    pub fn GetVpCount(VmSavedStateDumpHandle: VmSavedStateDumpHandle, VpCount: *mut u32)
+        -> HResult;
 
     /// Queries for the current Architecture/ISA the virtual processor was running at the time the
     /// saved state file was generated.
@@ -200,7 +198,7 @@ extern "C" {
         BytesRead: *mut u32,
     ) -> HResult;
 
-    /// Translates a virtual address to a pysical address using information found in the
+    /// Translates a virtual address to a physical address using information found in the
     /// guest's memory and processor's state.
     ///
     /// # Arguments
