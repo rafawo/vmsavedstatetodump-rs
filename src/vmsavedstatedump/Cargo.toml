@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Rafael Alcaraz Mercado <ramerc@microsoft.com>"]
 
 [dependencies]
-winapi = { version = "0.3.6", features = ["winuser"] }
+winapi = { version = "0.3.6", features = ["minwindef"] }
