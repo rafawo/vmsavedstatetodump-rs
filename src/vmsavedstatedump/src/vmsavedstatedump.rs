@@ -1,6 +1,6 @@
 //! This file contains the interface definitions for the VmSavedState Dump Provider APIs.
 
-use vmsavedstatedumpdefs::*;
+use crate::vmsavedstatedumpdefs::*;
 use winapi::shared::ntdef::{HRESULT, LPCWSTR, LPWSTR, PVOID};
 
 extern "C" {

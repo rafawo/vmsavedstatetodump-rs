@@ -1,7 +1,5 @@
 //! This file contains the VmSavedState Dump Provider definitions used by the APIs.
 
-extern crate std;
-
 use winapi::shared::minwindef::DWORD;
 use winapi::shared::ntdef::VOID;
 
