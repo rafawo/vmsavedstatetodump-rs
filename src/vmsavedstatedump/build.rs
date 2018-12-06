@@ -21,9 +21,15 @@ fn main() {
         Err(_) => String::from("10.0.17763.0")
     };
 
-    let lib_name = String::from("vmsavedstatedumpprovider.lib");
+    let lib_names = vec![
+        String::from("vmsavedstatedumpprovider.lib"),
+    ];
+
     let lib_root_path = format!("{}\\Lib\\{}\\um\\x64", root_win10_sdk_path, win10_sdk_version);
 
-    println!("cargo:rustc-link-lib=dylib={}", lib_name);
+    for lib_name in lib_names {
+        println!("cargo:rustc-link-lib=dylib={}", lib_name);
+    }
+
     println!("cargo:rustc-link-search={}", lib_root_path);
 }
