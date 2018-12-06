@@ -3,6 +3,7 @@
 use crate::vmsavedstatedumpdefs::*;
 use winapi::shared::ntdef::{HRESULT, LPCWSTR, LPWSTR, PVOID};
 
+#[link(name = "vmsavedstatedumpprovider")]
 extern "C" {
 
     /// Locates the saved state file(s) for a given VM and/or snapshot. This function uses WMI and the V1 or V2
