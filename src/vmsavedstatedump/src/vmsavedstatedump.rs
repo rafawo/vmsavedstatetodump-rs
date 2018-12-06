@@ -14,10 +14,14 @@ extern "C" {
     /// # Arguments
     ///
     /// * `VmName` - Supplies the VM name for which the saved state file will be located.
-    /// * `SnapshotName` - Supplies an optional snapshot name to locate its saved state file on relation to the given VM name.
-    /// * `BinPath` - Returns a pointer to a NULL-terminated string containing the full path name to the BIN file. The caller must call LocalFree on the returned pointer in order to release the memory occupied by the string.
-    /// * `VsvPath` - Returns a pointer to a NULL-terminated string containing the full path name to the VSV file. The caller must call LocalFree on the returned pointer in order to release the memory occupied by the string.
-    /// * `VmrsPath` - Returns a pointer to a NULL-terminated string containing the full path name to the VMRS file. The caller must call LocalFree on the returned pointer in order to release the memory occupied by the string.
+    /// * `SnapshotName` - Supplies an optional snapshot name to locate its saved state file
+    ///                    on relation to the given VM name.
+    /// * `BinPath` - Returns a pointer to a NULL-terminated string containing the full path name to the BIN file.
+    ///               The caller must call LocalFree on the returned pointer in order to release the memory occupied by the string.
+    /// * `VsvPath` - Returns a pointer to a NULL-terminated string containing the full path name to the VSV file.
+    ///               The caller must call LocalFree on the returned pointer in order to release the memory occupied by the string.
+    /// * `VmrsPath` - Returns a pointer to a NULL-terminated string containing the full path name to the VMRS file.
+    ///                The caller must call LocalFree on the returned pointer in order to release the memory occupied by the string.
     ///
     /// # Returns
     ///
@@ -225,11 +229,11 @@ extern "C" {
     /// * `VmSavedStateDumpHandle` - Supplies a handle to a dump provider instance.
     /// * `MemoryChunkPageSize` - Returns the size of a page in the memory chunk layout.
     /// * `MemoryChunks` - Supplies a buffer of memory chunk structures that are filled up with the
-    ///                                 requested information if the buffer size is the same or bigger than the
-    ///                                 memory chunks count for this guest.
+    ///                    requested information if the buffer size is the same or bigger than the
+    ///                    memory chunks count for this guest.
     /// * `MemoryChunkCount` - Supplies the size of the MemoryChunks buffer. If this count is lower than
-    ///                                 what the guest really has, then it returns the expected count. If it was
-    ///                                 higher than what the guest has, then it returns the exact count.
+    ///                        what the guest really has, then it returns the expected count. If it was
+    ///                        higher than what the guest has, then it returns the exact count.
     ///
     /// # Returns
     ///
