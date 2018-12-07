@@ -1,6 +1,6 @@
 pub mod vmsavedstatedumpdefs;
-
 pub mod vmsavedstatedump;
+pub mod vmsavedstatedumpprovider;
 
 mod windefs {
     use libc;
