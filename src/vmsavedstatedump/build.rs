@@ -21,7 +21,7 @@ fn main() {
         Err(_) => String::from("10.0.17763.0"),
     };
 
-    let lib_names = vec![String::from("vmsavedstatedumpprovider.lib")];
+    let lib_names = vec![String::from("vmsavedstatedumpprovider")];
 
     let lib_root_path = format!(
         "{}\\Lib\\{}\\um\\x64",
