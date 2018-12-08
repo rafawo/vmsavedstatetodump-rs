@@ -5,7 +5,7 @@ use crate::windefs::*;
 use std::ops;
 use widestring::U16CString;
 
-pub enum ErrorCode {
+pub enum ErrorType {
     Success(HResult),
     OutOfMemory(HResult),
     FileNotFound(HResult),
@@ -14,11 +14,17 @@ pub enum ErrorCode {
     WindowsHResult(HResult),
 }
 
-fn hresult_to_error_code(hresult: &HResult) -> ErrorCode {
+fn hresult_to_error_code(hresult: &HResult) -> ErrorType {
     // TODO: fill in the other cases
     match hresult {
-        0 => ErrorCode::Success(0),
-        other => ErrorCode::WindowsHResult(other.clone()),
+        0 => ErrorType::Success(0),
+        other => ErrorType::WindowsHResult(other.clone()),
+    }
+}
+
+pub fn apply_pending_replay_log(vmrs: &str) -> HResult {
+    unsafe {
+        vmsavedstatedump::ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
     }
 }
 
@@ -41,47 +47,64 @@ impl ops::Drop for VmSavedStateDumpProvider {
     }
 }
 
-pub fn load_saved_state_files(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, ErrorCode> {
-    let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
-    let result: HResult;
+impl VmSavedStateDumpProvider {
+    pub fn load_saved_state_files(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, ErrorType> {
+        let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
+        let result: HResult;
 
-    unsafe {
-        result = vmsavedstatedump::LoadSavedStateFiles(
-            U16CString::from_str(bin).unwrap().as_ptr(),
-            U16CString::from_str(vsv).unwrap().as_ptr(),
-            &mut dump_handle);
+        unsafe {
+            result = vmsavedstatedump::LoadSavedStateFiles(
+                U16CString::from_str(bin).unwrap().as_ptr(),
+                U16CString::from_str(vsv).unwrap().as_ptr(),
+                &mut dump_handle);
+        }
+
+        match hresult_to_error_code(&result) {
+            ErrorType::Success(_) => Ok(VmSavedStateDumpProvider {
+                handle: dump_handle,
+                saved_state: VmSavedStateFile::BinVsv(String::from(bin), String::from(vsv)),
+            }),
+            error => Err(error),
+        }
     }
 
-    match hresult_to_error_code(&result) {
-        ErrorCode::Success(_) => Ok(VmSavedStateDumpProvider {
-            handle: dump_handle,
-            saved_state: VmSavedStateFile::BinVsv(String::from(bin), String::from(vsv)),
-        }),
-        error => Err(error),
+    pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, ErrorType> {
+        let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
+        let result: HResult;
+
+        unsafe {
+            result = vmsavedstatedump::LoadSavedStateFile(
+                U16CString::from_str(vmrs).unwrap().as_ptr(),
+                &mut dump_handle);
+        }
+
+        match hresult_to_error_code(&result) {
+            ErrorType::Success(_) => Ok(VmSavedStateDumpProvider {
+                handle: dump_handle,
+                saved_state: VmSavedStateFile::Vmrs(String::from(vmrs)),
+            }),
+            error => Err(error),
+        }
     }
-}
 
-pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, ErrorCode> {
-    let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
-    let result: HResult;
+    pub fn get_vp_count(&self) -> Result<u32, ErrorType> {
+        let mut vp_count: u32 = 0;
+        let result: HResult;
 
-    unsafe {
-        result = vmsavedstatedump::LoadSavedStateFile(
-            U16CString::from_str(vmrs).unwrap().as_ptr(),
-            &mut dump_handle);
+        unsafe {
+            result = vmsavedstatedump::GetVpCount(self.handle.clone(), &mut vp_count);
+        }
+
+        match hresult_to_error_code(&result) {
+            ErrorType::Success(_) => Ok(vp_count),
+            error => Err(error),
+        }
     }
 
-    match hresult_to_error_code(&result) {
-        ErrorCode::Success(_) => Ok(VmSavedStateDumpProvider {
-            handle: dump_handle,
-            saved_state: VmSavedStateFile::Vmrs(String::from(vmrs)),
-        }),
-        error => Err(error),
-    }
-}
-
-pub fn apply_pending_replay_log(vmrs: &str) -> HResult {
-    unsafe {
-        vmsavedstatedump::ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
+    pub fn try_get_vp_count(&self) -> u32 {
+        match self.get_vp_count() {
+            Ok(vp_count) => vp_count,
+            Err(_) => 0,
+        }
     }
 }
