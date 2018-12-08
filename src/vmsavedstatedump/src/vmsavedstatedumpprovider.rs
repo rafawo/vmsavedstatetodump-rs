@@ -2,14 +2,14 @@
 //! Defines and provides Rust idiomatic abstractions of the API.
 
 use crate::vmsavedstatedumpdefs::*;
-use crate::vmsavedstatedump;
+use crate::vmsavedstatedump::*;
 use crate::windefs::*;
 
 use std::ops;
 use widestring::U16CString;
 
 /// Common error types that can be returned by the VmSavedStateDumpProvider API.
-pub enum ErrorType {
+pub enum Error {
     Success(HResult),
     OutOfMemory(HResult),
     FileNotFound(HResult),
@@ -18,18 +18,18 @@ pub enum ErrorType {
     WindowsHResult(HResult),
 }
 
-fn hresult_to_error_code(hresult: &HResult) -> ErrorType {
+fn hresult_to_error_code(hresult: &HResult) -> Error {
     // TODO: fill in the other cases
     match hresult {
-        0 => ErrorType::Success(0),
-        other => ErrorType::WindowsHResult(other.clone()),
+        0 => Error::Success(0),
+        other => Error::WindowsHResult(other.clone()),
     }
 }
 
 /// Applies a pending replay log to a VMRS file.
 pub fn apply_pending_replay_log(vmrs: &str) -> HResult {
     unsafe {
-        vmsavedstatedump::ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
+        ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
     }
 }
 
@@ -49,7 +49,7 @@ impl ops::Drop for VmSavedStateDumpProvider {
     fn drop(&mut self) {
         unsafe {
             // We ignore error code on purpose
-            vmsavedstatedump::ReleaseSavedStateFiles(self.handle.clone());
+            ReleaseSavedStateFiles(self.handle.clone());
         }
     }
 }
@@ -57,19 +57,19 @@ impl ops::Drop for VmSavedStateDumpProvider {
 impl VmSavedStateDumpProvider {
     /// Loads a BIN/VSV VM Saved state files and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_bin_vsv(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, ErrorType> {
+    pub fn load_bin_vsv(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, Error> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
         unsafe {
-            result = vmsavedstatedump::LoadSavedStateFiles(
+            result = LoadSavedStateFiles(
                 U16CString::from_str(bin).unwrap().as_ptr(),
                 U16CString::from_str(vsv).unwrap().as_ptr(),
                 &mut dump_handle);
         }
 
         match hresult_to_error_code(&result) {
-            ErrorType::Success(_) => Ok(VmSavedStateDumpProvider {
+            Error::Success(_) => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
                 saved_state: VmSavedStateFile::BinVsv(String::from(bin), String::from(vsv)),
             }),
@@ -79,18 +79,18 @@ impl VmSavedStateDumpProvider {
 
     /// Loads a VMRS VM Saved state file and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, ErrorType> {
+    pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, Error> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
         unsafe {
-            result = vmsavedstatedump::LoadSavedStateFile(
+            result = LoadSavedStateFile(
                 U16CString::from_str(vmrs).unwrap().as_ptr(),
                 &mut dump_handle);
         }
 
         match hresult_to_error_code(&result) {
-            ErrorType::Success(_) => Ok(VmSavedStateDumpProvider {
+            Error::Success(_) => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
                 saved_state: VmSavedStateFile::Vmrs(String::from(vmrs)),
             }),
@@ -99,16 +99,35 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns the virtual processor count.
-    pub fn get_vp_count(&self) -> Result<u32, ErrorType> {
-        let mut vp_count: u32 = 0;
+    // TODO:Implement a VirtualProcessor struct abstraction
+    // that provides an iterator and all the functions that operate
+    // over the VP, so that the rest of the functions don't have to
+    // manually specify each VP ID and it's safer to work on them.
+    pub fn get_vp_count(&self) -> Result<u32, Error> {
+        let mut vp_count = 0;
         let result: HResult;
 
         unsafe {
-            result = vmsavedstatedump::GetVpCount(self.handle.clone(), &mut vp_count);
+            result = GetVpCount(self.handle.clone(), &mut vp_count);
         }
 
         match hresult_to_error_code(&result) {
-            ErrorType::Success(_) => Ok(vp_count),
+            Error::Success(_) => Ok(vp_count),
+            error => Err(error),
+        }
+    }
+
+    /// Returns the virtual processor architecture.
+    pub fn get_architecture(&self, vp_id: u32) -> Result<VirtualProcessorArch, Error> {
+        let mut vp_arch = VirtualProcessorArch::Unknown;
+        let result: HResult;
+
+        unsafe {
+            result = GetArchitecture(self.handle.clone(), vp_id, &mut vp_arch);
+        }
+
+        match hresult_to_error_code(&result) {
+            Error::Success(_) => Ok(vp_arch),
             error => Err(error),
         }
     }

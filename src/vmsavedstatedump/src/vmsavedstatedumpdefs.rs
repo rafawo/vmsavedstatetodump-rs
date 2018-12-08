@@ -25,7 +25,7 @@ pub struct GpaMemoryChunk {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub enum VirtualProcessArch {
+pub enum VirtualProcessorArch {
     Unknown = 0,
     X86,
     X64,
@@ -268,7 +268,7 @@ impl std::fmt::Debug for RegisterRawId {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct VirtualProcessorRegister {
-    pub architecture: VirtualProcessArch,
+    pub architecture: VirtualProcessorArch,
     pub register_value: u64,
     pub raw_id: RegisterRawId,
 }

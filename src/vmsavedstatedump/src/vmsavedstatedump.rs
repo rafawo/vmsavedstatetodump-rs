@@ -132,7 +132,7 @@ extern "C" {
     pub fn GetArchitecture(
         VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpId: u32,
-        Architecture: *mut VirtualProcessArch,
+        Architecture: *mut VirtualProcessorArch,
     ) -> HResult;
 
     /// Queries for a specific register value for a given VP in a VmSavedStateDump.
