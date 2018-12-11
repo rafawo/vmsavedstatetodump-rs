@@ -21,12 +21,19 @@ pub enum ResultCode {
 
 #[allow(overflowing_literals)]
 fn hresult_to_result_code(hresult: &HResult) -> ResultCode {
-    // TODO: fill in the other cases
     let out_of_memory: HResult = 0x8007000E;
+    let file_not_found: HResult = 0x80030002;
+    let fail: HResult = 0x80004005;
+    let invalid_argument: HResult = 0x80070057;
+    let unexpected: HResult = 0x8000FFFF;
 
     match hresult {
         0 => ResultCode::Success(0),
         0x8007000E => ResultCode::OutOfMemory(out_of_memory),
+        0x80030002 => ResultCode::FileNotFound(file_not_found),
+        0x80004005 => ResultCode::Fail(fail),
+        0x80070057 => ResultCode::Fail(invalid_argument),
+        0x8000FFFF => ResultCode::Fail(unexpected),
         other => ResultCode::WindowsHResult(other.clone()),
     }
 }
