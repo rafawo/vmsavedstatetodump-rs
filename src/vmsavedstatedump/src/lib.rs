@@ -1,5 +1,5 @@
-pub mod vmsavedstatedumpdefs;
 pub mod vmsavedstatedump;
+pub mod vmsavedstatedumpdefs;
 pub mod vmsavedstatedumpprovider;
 
 mod windefs {

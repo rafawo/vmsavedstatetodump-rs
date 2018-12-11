@@ -1,8 +1,8 @@
 //! This module implements safe wrappers of the unsafe API surface to VmSavedStateDump.
 //! Defines and provides Rust idiomatic abstractions of the API.
 
-use crate::vmsavedstatedumpdefs::*;
 use crate::vmsavedstatedump::*;
+use crate::vmsavedstatedumpdefs::*;
 use crate::windefs::*;
 
 use std::ops;
@@ -28,9 +28,7 @@ fn hresult_to_error_code(hresult: &HResult) -> Error {
 
 /// Applies a pending replay log to a VMRS file.
 pub fn apply_pending_replay_log(vmrs: &str) -> HResult {
-    unsafe {
-        ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
-    }
+    unsafe { ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr()) }
 }
 
 /// Supported VM saved state file formats.
@@ -65,7 +63,8 @@ impl VmSavedStateDumpProvider {
             result = LoadSavedStateFiles(
                 U16CString::from_str(bin).unwrap().as_ptr(),
                 U16CString::from_str(vsv).unwrap().as_ptr(),
-                &mut dump_handle);
+                &mut dump_handle,
+            );
         }
 
         match hresult_to_error_code(&result) {
@@ -86,7 +85,8 @@ impl VmSavedStateDumpProvider {
         unsafe {
             result = LoadSavedStateFile(
                 U16CString::from_str(vmrs).unwrap().as_ptr(),
-                &mut dump_handle);
+                &mut dump_handle,
+            );
         }
 
         match hresult_to_error_code(&result) {
@@ -103,7 +103,7 @@ impl VmSavedStateDumpProvider {
     // that provides an iterator and all the functions that operate
     // over the VP, so that the rest of the functions don't have to
     // manually specify each VP ID and it's safer to work on them.
-    pub fn get_vp_count(&self) -> Result<u32, Error> {
+    pub fn vp_count(&self) -> Result<u32, Error> {
         let mut vp_count = 0;
         let result: HResult;
 
@@ -118,7 +118,7 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns the virtual processor architecture.
-    pub fn get_architecture(&self, vp_id: u32) -> Result<VirtualProcessorArch, Error> {
+    pub fn get_vp_architecture(&self, vp_id: u32) -> Result<VirtualProcessorArch, Error> {
         let mut vp_arch = VirtualProcessorArch::Unknown;
         let result: HResult;
 
@@ -128,6 +128,25 @@ impl VmSavedStateDumpProvider {
 
         match hresult_to_error_code(&result) {
             Error::Success(_) => Ok(vp_arch),
+            error => Err(error),
+        }
+    }
+
+    /// Returns a virtual processor register value.
+    pub fn get_vp_register_value(&self, vp_id: u32) -> Result<VirtualProcessorRegister, Error> {
+        let mut vp_register_value: VirtualProcessorRegister = VirtualProcessorRegister {
+            architecture: VirtualProcessorArch::Unknown,
+            register_value: 0,
+            raw_id: RegisterRawId { register_id: 0 },
+        };
+        let result: HResult;
+
+        unsafe {
+            result = GetRegisterValue(self.handle.clone(), vp_id, &mut vp_register_value);
+        }
+
+        match hresult_to_error_code(&result) {
+            Error::Success(_) => Ok(vp_register_value),
             error => Err(error),
         }
     }
