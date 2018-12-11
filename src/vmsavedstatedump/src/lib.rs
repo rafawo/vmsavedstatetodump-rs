@@ -2,7 +2,7 @@ pub mod vmsavedstatedump;
 pub mod vmsavedstatedumpdefs;
 pub mod vmsavedstatedumpprovider;
 
-mod windefs {
+pub mod windefs {
     use libc;
 
     pub type DWord = libc::c_ulong;

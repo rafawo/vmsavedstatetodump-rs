@@ -61,7 +61,7 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `mrsFile` - Supplies the path to the VMRS file whose any pending replay log will be applied.
+    /// * `VmrsFile` - Supplies the path to the VMRS file whose any pending replay log will be applied.
     ///
     /// # Returns
     ///

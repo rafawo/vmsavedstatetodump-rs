@@ -8,7 +8,7 @@ use crate::windefs::*;
 use std::ops;
 use widestring::U16CString;
 
-/// Common error types that can be returned by the VmSavedStateDumpProvider API.
+/// Common result codes that can be returned by the VmSavedStateDumpProvider API.
 #[derive(Debug)]
 pub enum ResultCode {
     Success(HResult),
@@ -40,8 +40,17 @@ fn hresult_to_result_code(hresult: &HResult) -> ResultCode {
 }
 
 /// Applies a pending replay log to a VMRS file.
-pub fn apply_pending_replay_log(vmrs: &str) -> HResult {
-    unsafe { ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr()) }
+pub fn apply_pending_replay_log(vmrs: &str) -> Result<(), ResultCode> {
+    let result: HResult;
+
+    unsafe {
+        result = ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
+    }
+
+    match hresult_to_result_code(&result) {
+        ResultCode::Success(_) => Ok(()),
+        error => Err(error),
+    }
 }
 
 /// Structure that abstracts access to a loaded VM Saved state file and its dump related APIs.
@@ -251,12 +260,13 @@ impl VmSavedStateDumpProvider {
             result = match hresult_to_result_code(&result) {
                 ResultCode::OutOfMemory(_) => {
                     // Allocate enough memory in the vector to fit the memory chunks
-                    for _ in 0..chunk_count {
-                        memory_chunks.push(GpaMemoryChunk {
+                    memory_chunks.resize(
+                        chunk_count as usize,
+                        GpaMemoryChunk {
                             guest_physical_start_page_index: 0,
                             page_count: 0,
-                        })
-                    }
+                        },
+                    );
 
                     // Actually get the chunks
                     GetGuestPhysicalMemoryChunks(
@@ -342,11 +352,15 @@ impl VmSavedStateDumpProvider {
     }
 }
 
+/// Represents a virtual processor of a VmSavedStateDumpProvider
+/// and exposes simpler APIs that work with the VP it represents.
 pub struct VirtualProcessor<'a> {
     provider: &'a VmSavedStateDumpProvider,
     id: u32,
 }
 
+/// Virtual processor iterator that enumerates all valid virtual processors
+/// for a given VmSavedStateDumpProvider.
 pub struct VirtualProcessorIter<'a> {
     provider: &'a VmSavedStateDumpProvider,
     current_id: u32,
@@ -371,10 +385,12 @@ impl<'a> Iterator for VirtualProcessorIter<'a> {
 }
 
 impl<'a> VirtualProcessor<'a> {
+    /// Returns the architecture of a given virtual processor.
     pub fn architecture(&self) -> Result<VirtualProcessorArch, ResultCode> {
         self.provider.get_vp_architecture(self.id)
     }
 
+    /// Returns the register value of a given virtual processor.
     pub fn register_value(
         &self,
         arch: VirtualProcessorArch,
@@ -384,6 +400,7 @@ impl<'a> VirtualProcessor<'a> {
             .get_vp_register_value(self.id, arch, register_id)
     }
 
+    /// Returns the paging mode of a given virtual processor.
     pub fn paging_mode(&self) -> Result<PagingMode, ResultCode> {
         self.provider.get_vp_paging_mode(self.id)
     }
