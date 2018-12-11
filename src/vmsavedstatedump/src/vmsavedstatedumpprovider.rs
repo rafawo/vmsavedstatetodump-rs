@@ -9,7 +9,7 @@ use std::ops;
 use widestring::U16CString;
 
 /// Common error types that can be returned by the VmSavedStateDumpProvider API.
-pub enum Error {
+pub enum ResultCode {
     Success(HResult),
     OutOfMemory(HResult),
     FileNotFound(HResult),
@@ -20,14 +20,14 @@ pub enum Error {
 }
 
 #[allow(overflowing_literals)]
-fn hresult_to_error_code(hresult: &HResult) -> Error {
+fn hresult_to_result_code(hresult: &HResult) -> ResultCode {
     // TODO: fill in the other cases
     let out_of_memory: HResult = 0x8007000E;
 
     match hresult {
-        0 => Error::Success(0),
-        0x8007000E => Error::OutOfMemory(out_of_memory),
-        other => Error::WindowsHResult(other.clone()),
+        0 => ResultCode::Success(0),
+        0x8007000E => ResultCode::OutOfMemory(out_of_memory),
+        other => ResultCode::WindowsHResult(other.clone()),
     }
 }
 
@@ -62,7 +62,7 @@ impl ops::Drop for VmSavedStateDumpProvider {
 impl VmSavedStateDumpProvider {
     /// Loads a BIN/VSV VM Saved state files and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_bin_vsv(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, Error> {
+    pub fn load_bin_vsv(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, ResultCode> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
@@ -74,8 +74,8 @@ impl VmSavedStateDumpProvider {
             );
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(VmSavedStateDumpProvider {
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
                 saved_state: VmSavedStateFile::BinVsv(String::from(bin), String::from(vsv)),
             }),
@@ -85,7 +85,7 @@ impl VmSavedStateDumpProvider {
 
     /// Loads a VMRS VM Saved state file and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, Error> {
+    pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, ResultCode> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
@@ -96,8 +96,8 @@ impl VmSavedStateDumpProvider {
             );
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(VmSavedStateDumpProvider {
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
                 saved_state: VmSavedStateFile::Vmrs(String::from(vmrs)),
             }),
@@ -110,7 +110,7 @@ impl VmSavedStateDumpProvider {
     // that provides an iterator and all the functions that operate
     // over the VP, so that the rest of the functions don't have to
     // manually specify each VP ID and it's safer to work on them.
-    pub fn vp_count(&self) -> Result<u32, Error> {
+    pub fn vp_count(&self) -> Result<u32, ResultCode> {
         let mut vp_count = 0;
         let result: HResult;
 
@@ -118,14 +118,14 @@ impl VmSavedStateDumpProvider {
             result = GetVpCount(self.handle.clone(), &mut vp_count);
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(vp_count),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(vp_count),
             error => Err(error),
         }
     }
 
     /// Returns the virtual processor architecture.
-    pub fn get_vp_architecture(&self, vp_id: u32) -> Result<VirtualProcessorArch, Error> {
+    pub fn get_vp_architecture(&self, vp_id: u32) -> Result<VirtualProcessorArch, ResultCode> {
         let mut vp_arch = VirtualProcessorArch::Unknown;
         let result: HResult;
 
@@ -133,14 +133,14 @@ impl VmSavedStateDumpProvider {
             result = GetArchitecture(self.handle.clone(), vp_id, &mut vp_arch);
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(vp_arch),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(vp_arch),
             error => Err(error),
         }
     }
 
     /// Returns a virtual processor register value.
-    pub fn get_vp_register_value(&self, vp_id: u32) -> Result<VirtualProcessorRegister, Error> {
+    pub fn get_vp_register_value(&self, vp_id: u32) -> Result<VirtualProcessorRegister, ResultCode> {
         let mut vp_register_value: VirtualProcessorRegister = VirtualProcessorRegister {
             architecture: VirtualProcessorArch::Unknown,
             register_value: 0,
@@ -152,14 +152,14 @@ impl VmSavedStateDumpProvider {
             result = GetRegisterValue(self.handle.clone(), vp_id, &mut vp_register_value);
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(vp_register_value),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(vp_register_value),
             error => Err(error),
         }
     }
 
     /// Returns a virtual processor paging mode.
-    pub fn get_vp_paging_mode(&self, vp_id: u32) -> Result<PagingMode, Error> {
+    pub fn get_vp_paging_mode(&self, vp_id: u32) -> Result<PagingMode, ResultCode> {
         let mut vp_paging_mode = PagingMode::Invalid;
         let result: HResult;
 
@@ -167,8 +167,8 @@ impl VmSavedStateDumpProvider {
             result = GetPagingMode(self.handle.clone(), vp_id, &mut vp_paging_mode);
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(vp_paging_mode),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(vp_paging_mode),
             error => Err(error),
         }
     }
@@ -178,7 +178,7 @@ impl VmSavedStateDumpProvider {
         &self,
         physical_address: GuestPhysicalAddress,
         buffer: &mut [u8],
-    ) -> Result<u32, Error> {
+    ) -> Result<u32, ResultCode> {
         let buffer_size = buffer.len() as u32;
         let buffer_ptr = buffer.as_mut_ptr();
         let mut bytes_read: u32 = 0;
@@ -194,8 +194,8 @@ impl VmSavedStateDumpProvider {
             );
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(bytes_read),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(bytes_read),
             error => Err(error),
         }
     }
@@ -206,7 +206,7 @@ impl VmSavedStateDumpProvider {
         &self,
         vp_id: u32,
         virtual_address: GuestVirtualAddress,
-    ) -> Result<GuestPhysicalAddress, Error> {
+    ) -> Result<GuestPhysicalAddress, ResultCode> {
         let mut physical_address: GuestPhysicalAddress = 0;
         let result: HResult;
 
@@ -219,14 +219,14 @@ impl VmSavedStateDumpProvider {
             );
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok(physical_address),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(physical_address),
             error => Err(error),
         }
     }
 
     /// Returns a tuple with the page size and the layout of the physical memory of the guest.
-    pub fn guest_physical_memory_chunks(&self) -> Result<(u64, Vec<GpaMemoryChunk>), Error> {
+    pub fn guest_physical_memory_chunks(&self) -> Result<(u64, Vec<GpaMemoryChunk>), ResultCode> {
         let mut memory_chunks: Vec<GpaMemoryChunk> = vec![];
         let mut page_size: u64 = 0;
         let mut chunk_count: u64 = 0;
@@ -241,8 +241,8 @@ impl VmSavedStateDumpProvider {
                 &mut chunk_count,
             );
 
-            result = match hresult_to_error_code(&result) {
-                Error::OutOfMemory(_) => {
+            result = match hresult_to_result_code(&result) {
+                ResultCode::OutOfMemory(_) => {
                     // Allocate enough memory in the vector to fit the memory chunks
                     for _ in 0..chunk_count {
                         memory_chunks.push(GpaMemoryChunk {
@@ -263,8 +263,8 @@ impl VmSavedStateDumpProvider {
             }
         }
 
-        match hresult_to_error_code(&result) {
-            Error::Success(_) => Ok((page_size, memory_chunks)),
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok((page_size, memory_chunks)),
             error => Err(error),
         }
     }
