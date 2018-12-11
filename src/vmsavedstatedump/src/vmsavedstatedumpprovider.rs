@@ -150,4 +150,19 @@ impl VmSavedStateDumpProvider {
             error => Err(error),
         }
     }
+
+    /// Returns a virtual processor paging mode.
+    pub fn get_vp_paging_mode(&self, vp_id: u32) -> Result<PagingMode, Error> {
+        let mut vp_paging_mode = PagingMode::Invalid;
+        let result: HResult;
+
+        unsafe {
+            result = GetPagingMode(self.handle.clone(), vp_id, &mut vp_paging_mode);
+        }
+
+        match hresult_to_error_code(&result) {
+            Error::Success(_) => Ok(vp_paging_mode),
+            error => Err(error),
+        }
+    }
 }
