@@ -285,7 +285,7 @@ extern "C" {
     pub fn ReadGuestRawSavedMemory(
         VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         RawSavedMemoryOffset: u64,
-        Buffer: *mut PVoid,
+        Buffer: PVoid,
         BufferSize: u32,
         BytesRead: *mut u32,
     ) -> HResult;

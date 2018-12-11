@@ -140,7 +140,10 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns a virtual processor register value.
-    pub fn get_vp_register_value(&self, vp_id: u32) -> Result<VirtualProcessorRegister, ResultCode> {
+    pub fn get_vp_register_value(
+        &self,
+        vp_id: u32,
+    ) -> Result<VirtualProcessorRegister, ResultCode> {
         let mut vp_register_value: VirtualProcessorRegister = VirtualProcessorRegister {
             architecture: VirtualProcessorArch::Unknown,
             register_value: 0,
@@ -270,7 +273,10 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Translates the given guest physical address to a raw saved memory offset.
-    pub fn guest_physical_address_to_raw_saved_memory_offset(&self, physical_address: GuestPhysicalAddress) -> Result<u64, ResultCode> {
+    pub fn guest_physical_address_to_raw_saved_memory_offset(
+        &self,
+        physical_address: GuestPhysicalAddress,
+    ) -> Result<u64, ResultCode> {
         let mut raw_saved_memory_offset: u64 = 0;
         let result: HResult;
 
@@ -284,6 +290,34 @@ impl VmSavedStateDumpProvider {
 
         match hresult_to_result_code(&result) {
             ResultCode::Success(_) => Ok(raw_saved_memory_offset),
+            error => Err(error),
+        }
+    }
+
+    /// Reads raw memory from the saved state file. This function reads raw memory from the saved state file
+    /// as if it were a flat memory layout, regardless of the guest memory layout.
+    pub fn read_guest_raw_saved_memory(
+        &self,
+        offset: u64,
+        buffer: &mut [u8],
+    ) -> Result<u32, ResultCode> {
+        let buffer_size = buffer.len() as u32;
+        let buffer_ptr = buffer.as_mut_ptr();
+        let mut bytes_read: u32 = 0;
+        let result: HResult;
+
+        unsafe {
+            result = ReadGuestRawSavedMemory(
+                self.handle.clone(),
+                offset,
+                buffer_ptr as PVoid,
+                buffer_size,
+                &mut bytes_read,
+            );
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(bytes_read),
             error => Err(error),
         }
     }
