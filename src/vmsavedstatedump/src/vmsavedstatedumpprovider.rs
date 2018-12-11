@@ -9,6 +9,7 @@ use std::ops;
 use widestring::U16CString;
 
 /// Common error types that can be returned by the VmSavedStateDumpProvider API.
+#[derive(Debug)]
 pub enum ResultCode {
     Success(HResult),
     OutOfMemory(HResult),
@@ -102,10 +103,6 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns the virtual processor count.
-    // TODO:Implement a VirtualProcessor struct abstraction
-    // that provides an iterator and all the functions that operate
-    // over the VP, so that the rest of the functions don't have to
-    // manually specify each VP ID and it's safer to work on them.
     pub fn vp_count(&self) -> Result<u32, ResultCode> {
         let mut vp_count = 0;
         let result: HResult;
@@ -117,6 +114,15 @@ impl VmSavedStateDumpProvider {
         match hresult_to_result_code(&result) {
             ResultCode::Success(_) => Ok(vp_count),
             error => Err(error),
+        }
+    }
+
+    /// Returns an iterator to virtual processors associated to this saved state file.
+    pub fn vp_iter(&self) -> VirtualProcessorIter {
+        VirtualProcessorIter {
+            provider: &self,
+            current_id: 0,
+            count: self.vp_count().unwrap(),
         }
     }
 
@@ -139,11 +145,13 @@ impl VmSavedStateDumpProvider {
     pub fn get_vp_register_value(
         &self,
         vp_id: u32,
+        arch: VirtualProcessorArch,
+        register_id: RegisterRawId,
     ) -> Result<VirtualProcessorRegister, ResultCode> {
         let mut vp_register_value: VirtualProcessorRegister = VirtualProcessorRegister {
-            architecture: VirtualProcessorArch::Unknown,
+            architecture: arch,
             register_value: 0,
-            raw_id: RegisterRawId { register_id: 0 },
+            raw_id: register_id,
         };
         let result: HResult;
 
@@ -331,5 +339,52 @@ impl VmSavedStateDumpProvider {
             ResultCode::Success(_) => Ok(raw_memory_size),
             error => Err(error),
         }
+    }
+}
+
+pub struct VirtualProcessor<'a> {
+    provider: &'a VmSavedStateDumpProvider,
+    id: u32,
+}
+
+pub struct VirtualProcessorIter<'a> {
+    provider: &'a VmSavedStateDumpProvider,
+    current_id: u32,
+    count: u32,
+}
+
+impl<'a> Iterator for VirtualProcessorIter<'a> {
+    type Item = VirtualProcessor<'a>;
+
+    fn next(&mut self) -> Option<VirtualProcessor<'a>> {
+        self.current_id += 1;
+
+        if self.current_id < self.count {
+            Some(VirtualProcessor {
+                provider: &self.provider,
+                id: self.current_id,
+            })
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a> VirtualProcessor<'a> {
+    pub fn architecture(&self) -> Result<VirtualProcessorArch, ResultCode> {
+        self.provider.get_vp_architecture(self.id)
+    }
+
+    pub fn register_value(
+        &self,
+        arch: VirtualProcessorArch,
+        register_id: RegisterRawId,
+    ) -> Result<VirtualProcessorRegister, ResultCode> {
+        self.provider
+            .get_vp_register_value(self.id, arch, register_id)
+    }
+
+    pub fn paging_mode(&self) -> Result<PagingMode, ResultCode> {
+        self.provider.get_vp_paging_mode(self.id)
     }
 }
