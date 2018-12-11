@@ -11,30 +11,24 @@ use widestring::U16CString;
 /// Common result codes that can be returned by the VmSavedStateDumpProvider API.
 #[derive(Debug)]
 pub enum ResultCode {
-    Success(HResult),
-    OutOfMemory(HResult),
-    FileNotFound(HResult),
-    Fail(HResult),
-    InvalidArgument(HResult),
-    Unexpected(HResult),
+    Success,
+    OutOfMemory,
+    FileNotFound,
+    Fail,
+    InvalidArgument,
+    Unexpected,
     WindowsHResult(HResult),
 }
 
 #[allow(overflowing_literals)]
 fn hresult_to_result_code(hresult: &HResult) -> ResultCode {
-    let out_of_memory: HResult = 0x8007000E;
-    let file_not_found: HResult = 0x80030002;
-    let fail: HResult = 0x80004005;
-    let invalid_argument: HResult = 0x80070057;
-    let unexpected: HResult = 0x8000FFFF;
-
     match hresult {
-        0 => ResultCode::Success(0),
-        0x8007000E => ResultCode::OutOfMemory(out_of_memory),
-        0x80030002 => ResultCode::FileNotFound(file_not_found),
-        0x80004005 => ResultCode::Fail(fail),
-        0x80070057 => ResultCode::Fail(invalid_argument),
-        0x8000FFFF => ResultCode::Fail(unexpected),
+        0 => ResultCode::Success,
+        0x8007000E => ResultCode::OutOfMemory,
+        0x80030002 => ResultCode::FileNotFound,
+        0x80004005 => ResultCode::Fail,
+        0x80070057 => ResultCode::InvalidArgument,
+        0x8000FFFF => ResultCode::Unexpected,
         other => ResultCode::WindowsHResult(other.clone()),
     }
 }
@@ -48,7 +42,7 @@ pub fn apply_pending_replay_log(vmrs: &str) -> Result<(), ResultCode> {
     }
 
     match hresult_to_result_code(&result) {
-        ResultCode::Success(_) => Ok(()),
+        ResultCode::Success => Ok(()),
         error => Err(error),
     }
 }
@@ -83,7 +77,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(VmSavedStateDumpProvider {
+            ResultCode::Success => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
             }),
             error => Err(error),
@@ -104,7 +98,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(VmSavedStateDumpProvider {
+            ResultCode::Success => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
             }),
             error => Err(error),
@@ -121,7 +115,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(vp_count),
+            ResultCode::Success => Ok(vp_count),
             error => Err(error),
         }
     }
@@ -145,7 +139,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(vp_arch),
+            ResultCode::Success => Ok(vp_arch),
             error => Err(error),
         }
     }
@@ -169,7 +163,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(vp_register_value),
+            ResultCode::Success => Ok(vp_register_value),
             error => Err(error),
         }
     }
@@ -184,7 +178,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(vp_paging_mode),
+            ResultCode::Success => Ok(vp_paging_mode),
             error => Err(error),
         }
     }
@@ -211,7 +205,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(bytes_read),
+            ResultCode::Success => Ok(bytes_read),
             error => Err(error),
         }
     }
@@ -236,7 +230,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(physical_address),
+            ResultCode::Success => Ok(physical_address),
             error => Err(error),
         }
     }
@@ -258,7 +252,7 @@ impl VmSavedStateDumpProvider {
             );
 
             result = match hresult_to_result_code(&result) {
-                ResultCode::OutOfMemory(_) => {
+                ResultCode::OutOfMemory => {
                     // Allocate enough memory in the vector to fit the memory chunks
                     memory_chunks.resize(
                         chunk_count as usize,
@@ -281,7 +275,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok((page_size, memory_chunks)),
+            ResultCode::Success => Ok((page_size, memory_chunks)),
             error => Err(error),
         }
     }
@@ -303,7 +297,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(raw_saved_memory_offset),
+            ResultCode::Success => Ok(raw_saved_memory_offset),
             error => Err(error),
         }
     }
@@ -331,7 +325,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(bytes_read),
+            ResultCode::Success => Ok(bytes_read),
             error => Err(error),
         }
     }
@@ -346,7 +340,7 @@ impl VmSavedStateDumpProvider {
         }
 
         match hresult_to_result_code(&result) {
-            ResultCode::Success(_) => Ok(raw_memory_size),
+            ResultCode::Success => Ok(raw_memory_size),
             error => Err(error),
         }
     }
