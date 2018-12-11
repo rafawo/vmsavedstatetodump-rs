@@ -321,4 +321,19 @@ impl VmSavedStateDumpProvider {
             error => Err(error),
         }
     }
+
+    /// Returns the size in bytes of the saved memory for a given VM saved state file.
+    pub fn guest_raw_saved_memory_size(&self) -> Result<u64, ResultCode> {
+        let mut raw_memory_size: u64 = 0;
+        let result: HResult;
+
+        unsafe {
+            result = GetGuestRawSavedMemorySize(self.handle.clone(), &mut raw_memory_size);
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(raw_memory_size),
+            error => Err(error),
+        }
+    }
 }
