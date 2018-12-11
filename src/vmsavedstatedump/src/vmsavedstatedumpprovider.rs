@@ -14,14 +14,19 @@ pub enum Error {
     OutOfMemory(HResult),
     FileNotFound(HResult),
     Fail(HResult),
+    InvalidArgument(HResult),
     Unexpected(HResult),
     WindowsHResult(HResult),
 }
 
+#[allow(overflowing_literals)]
 fn hresult_to_error_code(hresult: &HResult) -> Error {
     // TODO: fill in the other cases
+    let out_of_memory: HResult = 0x8007000E;
+
     match hresult {
         0 => Error::Success(0),
+        0x8007000E => Error::OutOfMemory(out_of_memory),
         other => Error::WindowsHResult(other.clone()),
     }
 }
@@ -216,6 +221,50 @@ impl VmSavedStateDumpProvider {
 
         match hresult_to_error_code(&result) {
             Error::Success(_) => Ok(physical_address),
+            error => Err(error),
+        }
+    }
+
+    /// Returns a tuple with the page size and the layout of the physical memory of the guest.
+    pub fn guest_physical_memory_chunks(&self) -> Result<(u64, Vec<GpaMemoryChunk>), Error> {
+        let mut memory_chunks: Vec<GpaMemoryChunk> = vec![];
+        let mut page_size: u64 = 0;
+        let mut chunk_count: u64 = 0;
+        let mut result: HResult;
+
+        // First figure out memory chunks vector size
+        unsafe {
+            result = GetGuestPhysicalMemoryChunks(
+                self.handle.clone(),
+                &mut page_size,
+                std::ptr::null_mut(),
+                &mut chunk_count,
+            );
+
+            result = match hresult_to_error_code(&result) {
+                Error::OutOfMemory(_) => {
+                    // Allocate enough memory in the vector to fit the memory chunks
+                    for _ in 0..chunk_count {
+                        memory_chunks.push(GpaMemoryChunk {
+                            guest_physical_start_page_index: 0,
+                            page_count: 0,
+                        })
+                    }
+
+                    // Actually get the chunks
+                    GetGuestPhysicalMemoryChunks(
+                        self.handle.clone(),
+                        &mut page_size,
+                        memory_chunks.as_mut_ptr(),
+                        &mut chunk_count,
+                    )
+                }
+                error => return Err(error), // Any other result here is unexpected
+            }
+        }
+
+        match hresult_to_error_code(&result) {
+            Error::Success(_) => Ok((page_size, memory_chunks)),
             error => Err(error),
         }
     }
