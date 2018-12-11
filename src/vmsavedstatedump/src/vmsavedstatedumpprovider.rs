@@ -192,4 +192,29 @@ impl VmSavedStateDumpProvider {
             error => Err(error),
         }
     }
+
+    /// Translates a virtual address to a physical address using information found in the
+    /// guest's memory and processor's state.
+    pub fn guest_virtual_to_physical_address(
+        &self,
+        vp_id: u32,
+        virtual_address: GuestVirtualAddress,
+    ) -> Result<GuestPhysicalAddress, Error> {
+        let mut physical_address: GuestPhysicalAddress = 0;
+        let result: HResult;
+
+        unsafe {
+            result = GuestVirtualAddressToPhysicalAddress(
+                self.handle.clone(),
+                vp_id,
+                virtual_address,
+                &mut physical_address,
+            );
+        }
+
+        match hresult_to_error_code(&result) {
+            Error::Success(_) => Ok(physical_address),
+            error => Err(error),
+        }
+    }
 }
