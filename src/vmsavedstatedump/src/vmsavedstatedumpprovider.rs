@@ -165,4 +165,31 @@ impl VmSavedStateDumpProvider {
             error => Err(error),
         }
     }
+
+    /// Reads a sized guest physical address into the supplied buffer.
+    pub fn read_guest_physical_address(
+        &self,
+        physical_address: GuestPhysicalAddress,
+        buffer: &mut [u8],
+    ) -> Result<u32, Error> {
+        let buffer_size = buffer.len() as u32;
+        let buffer_ptr = buffer.as_mut_ptr();
+        let mut bytes_read: u32 = 0;
+        let result: HResult;
+
+        unsafe {
+            result = ReadGuestPhysicalAddress(
+                self.handle.clone(),
+                physical_address,
+                buffer_ptr as PVoid,
+                buffer_size,
+                &mut bytes_read,
+            );
+        }
+
+        match hresult_to_error_code(&result) {
+            Error::Success(_) => Ok(bytes_read),
+            error => Err(error),
+        }
+    }
 }

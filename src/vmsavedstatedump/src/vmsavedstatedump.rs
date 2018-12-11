@@ -193,7 +193,7 @@ extern "C" {
     pub fn ReadGuestPhysicalAddress(
         VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         PhysicalAddress: GuestPhysicalAddress,
-        Buffer: *mut PVoid,
+        Buffer: PVoid,
         BufferSize: u32,
         BytesRead: *mut u32,
     ) -> HResult;
