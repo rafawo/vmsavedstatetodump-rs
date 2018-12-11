@@ -268,4 +268,23 @@ impl VmSavedStateDumpProvider {
             error => Err(error),
         }
     }
+
+    /// Translates the given guest physical address to a raw saved memory offset.
+    pub fn guest_physical_address_to_raw_saved_memory_offset(&self, physical_address: GuestPhysicalAddress) -> Result<u64, ResultCode> {
+        let mut raw_saved_memory_offset: u64 = 0;
+        let result: HResult;
+
+        unsafe {
+            result = GuestPhysicalAddressToRawSavedMemoryOffset(
+                self.handle.clone(),
+                physical_address,
+                &mut raw_saved_memory_offset,
+            );
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success(_) => Ok(raw_saved_memory_offset),
+            error => Err(error),
+        }
+    }
 }
