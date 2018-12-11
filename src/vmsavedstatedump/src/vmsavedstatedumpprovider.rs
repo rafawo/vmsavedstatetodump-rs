@@ -43,18 +43,9 @@ pub fn apply_pending_replay_log(vmrs: &str) -> HResult {
     unsafe { ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr()) }
 }
 
-/// Supported VM saved state file formats.
-enum VmSavedStateFile {
-    BinVsv(String, String),
-    Vmrs(String),
-}
-
 /// Structure that abstracts access to a loaded VM Saved state file and its dump related APIs.
 pub struct VmSavedStateDumpProvider {
     handle: VmSavedStateDumpHandle,
-
-    #[allow(dead_code)]
-    saved_state: VmSavedStateFile,
 }
 
 impl ops::Drop for VmSavedStateDumpProvider {
@@ -84,7 +75,6 @@ impl VmSavedStateDumpProvider {
         match hresult_to_result_code(&result) {
             ResultCode::Success(_) => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
-                saved_state: VmSavedStateFile::BinVsv(String::from(bin), String::from(vsv)),
             }),
             error => Err(error),
         }
@@ -106,7 +96,6 @@ impl VmSavedStateDumpProvider {
         match hresult_to_result_code(&result) {
             ResultCode::Success(_) => Ok(VmSavedStateDumpProvider {
                 handle: dump_handle,
-                saved_state: VmSavedStateFile::Vmrs(String::from(vmrs)),
             }),
             error => Err(error),
         }
