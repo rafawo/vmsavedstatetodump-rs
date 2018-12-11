@@ -40,6 +40,8 @@ enum VmSavedStateFile {
 /// Structure that abstracts access to a loaded VM Saved state file and its dump related APIs.
 pub struct VmSavedStateDumpProvider {
     handle: VmSavedStateDumpHandle,
+
+    #[allow(dead_code)]
     saved_state: VmSavedStateFile,
 }
 
