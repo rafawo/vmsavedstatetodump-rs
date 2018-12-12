@@ -1,8 +1,8 @@
 //! There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
 //! saved state files from being loaded in sequence, reusing the same handle.
 //!
-//! A fix has been made, but won't be until the next official release of the windows
-//! 10 SDK. As a workaround, a private fix can be found in https://1drv.ms/u/s!ArJxuNplQduwr8V4AuAELz2KE6SLvQ
+//! A fix has been made, but won't be in until the next official release of the windows 10 SDK.
+//! As a workaround, a private fix can be found in https://1drv.ms/u/s!ArJxuNplQduwr8V4AuAELz2KE6SLvQ
 //!
 
 use std::path::{Path, PathBuf};
