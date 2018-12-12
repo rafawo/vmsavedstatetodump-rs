@@ -9,7 +9,7 @@ use std::ops;
 use widestring::U16CString;
 
 /// Common result codes that can be returned by the VmSavedStateDumpProvider API.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ResultCode {
     Success,
     OutOfMemory,
@@ -25,7 +25,7 @@ fn hresult_to_result_code(hresult: &HResult) -> ResultCode {
     match hresult {
         0 => ResultCode::Success,
         0x8007000E => ResultCode::OutOfMemory,
-        0x80030002 => ResultCode::FileNotFound,
+        0x80070002 => ResultCode::FileNotFound,
         0x80004005 => ResultCode::Fail,
         0x80070057 => ResultCode::InvalidArgument,
         0x8000FFFF => ResultCode::Unexpected,
@@ -48,6 +48,7 @@ pub fn apply_pending_replay_log(vmrs: &str) -> Result<(), ResultCode> {
 }
 
 /// Structure that abstracts access to a loaded VM Saved state file and its dump related APIs.
+#[derive(Debug)]
 pub struct VmSavedStateDumpProvider {
     handle: VmSavedStateDumpHandle,
 }
@@ -56,7 +57,7 @@ impl ops::Drop for VmSavedStateDumpProvider {
     fn drop(&mut self) {
         unsafe {
             // We ignore error code on purpose
-            ReleaseSavedStateFiles(self.handle.clone());
+            ReleaseSavedStateFiles(self.handle);
         }
     }
 }
@@ -111,7 +112,7 @@ impl VmSavedStateDumpProvider {
         let result: HResult;
 
         unsafe {
-            result = GetVpCount(self.handle.clone(), &mut vp_count);
+            result = GetVpCount(self.handle, &mut vp_count);
         }
 
         match hresult_to_result_code(&result) {
@@ -135,7 +136,7 @@ impl VmSavedStateDumpProvider {
         let result: HResult;
 
         unsafe {
-            result = GetArchitecture(self.handle.clone(), vp_id, &mut vp_arch);
+            result = GetArchitecture(self.handle, vp_id, &mut vp_arch);
         }
 
         match hresult_to_result_code(&result) {
@@ -159,7 +160,7 @@ impl VmSavedStateDumpProvider {
         let result: HResult;
 
         unsafe {
-            result = GetRegisterValue(self.handle.clone(), vp_id, &mut vp_register_value);
+            result = GetRegisterValue(self.handle, vp_id, &mut vp_register_value);
         }
 
         match hresult_to_result_code(&result) {
@@ -174,7 +175,7 @@ impl VmSavedStateDumpProvider {
         let result: HResult;
 
         unsafe {
-            result = GetPagingMode(self.handle.clone(), vp_id, &mut vp_paging_mode);
+            result = GetPagingMode(self.handle, vp_id, &mut vp_paging_mode);
         }
 
         match hresult_to_result_code(&result) {
@@ -196,7 +197,7 @@ impl VmSavedStateDumpProvider {
 
         unsafe {
             result = ReadGuestPhysicalAddress(
-                self.handle.clone(),
+                self.handle,
                 physical_address,
                 buffer_ptr as PVoid,
                 buffer_size,
@@ -222,7 +223,7 @@ impl VmSavedStateDumpProvider {
 
         unsafe {
             result = GuestVirtualAddressToPhysicalAddress(
-                self.handle.clone(),
+                self.handle,
                 vp_id,
                 virtual_address,
                 &mut physical_address,
@@ -245,7 +246,7 @@ impl VmSavedStateDumpProvider {
         // First figure out memory chunks vector size
         unsafe {
             result = GetGuestPhysicalMemoryChunks(
-                self.handle.clone(),
+                self.handle,
                 &mut page_size,
                 std::ptr::null_mut(),
                 &mut chunk_count,
@@ -264,7 +265,7 @@ impl VmSavedStateDumpProvider {
 
                     // Actually get the chunks
                     GetGuestPhysicalMemoryChunks(
-                        self.handle.clone(),
+                        self.handle,
                         &mut page_size,
                         memory_chunks.as_mut_ptr(),
                         &mut chunk_count,
@@ -290,7 +291,7 @@ impl VmSavedStateDumpProvider {
 
         unsafe {
             result = GuestPhysicalAddressToRawSavedMemoryOffset(
-                self.handle.clone(),
+                self.handle,
                 physical_address,
                 &mut raw_saved_memory_offset,
             );
@@ -316,7 +317,7 @@ impl VmSavedStateDumpProvider {
 
         unsafe {
             result = ReadGuestRawSavedMemory(
-                self.handle.clone(),
+                self.handle,
                 offset,
                 buffer_ptr as PVoid,
                 buffer_size,
@@ -336,7 +337,7 @@ impl VmSavedStateDumpProvider {
         let result: HResult;
 
         unsafe {
-            result = GetGuestRawSavedMemorySize(self.handle.clone(), &mut raw_memory_size);
+            result = GetGuestRawSavedMemorySize(self.handle, &mut raw_memory_size);
         }
 
         match hresult_to_result_code(&result) {
@@ -348,6 +349,7 @@ impl VmSavedStateDumpProvider {
 
 /// Represents a virtual processor of a VmSavedStateDumpProvider
 /// and exposes simpler APIs that work with the VP it represents.
+#[derive(Debug)]
 pub struct VirtualProcessor<'a> {
     provider: &'a VmSavedStateDumpProvider,
     id: u32,
@@ -355,6 +357,7 @@ pub struct VirtualProcessor<'a> {
 
 /// Virtual processor iterator that enumerates all valid virtual processors
 /// for a given VmSavedStateDumpProvider.
+#[derive(Debug)]
 pub struct VirtualProcessorIter<'a> {
     provider: &'a VmSavedStateDumpProvider,
     current_id: u32,

@@ -3,7 +3,7 @@ use vmsavedstatedump_rs::vmsavedstatedumpprovider::*;
 
 fn get_test_bin_vsv_file_paths() -> (String, String) {
     let mut bin_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    bin_file_path.push("tests\\test_file.vsv");
+    bin_file_path.push("tests\\test_file.bin");
     assert!(Path::new(&bin_file_path).exists());
     println!("Test file path: {}", bin_file_path.to_str().unwrap());
 
@@ -26,16 +26,60 @@ fn get_test_vmrs_file_path() -> String {
     String::from(vmrs_file_path.to_str().unwrap())
 }
 
+fn try_get_bin_vsv_test_provider() -> Result<VmSavedStateDumpProvider, ResultCode> {
+    let file_paths = get_test_bin_vsv_file_paths();
+    VmSavedStateDumpProvider::load_bin_vsv(&file_paths.0, &file_paths.1)
+}
+
+fn get_bin_vsv_test_provider() -> VmSavedStateDumpProvider {
+    try_get_bin_vsv_test_provider().unwrap()
+}
+
+fn try_get_vmrs_test_provider() -> Result<VmSavedStateDumpProvider, ResultCode> {
+    let file_path = get_test_vmrs_file_path();
+    VmSavedStateDumpProvider::load_vmrs(&file_path)
+}
+
+fn get_vmrs_test_provider() -> VmSavedStateDumpProvider {
+    try_get_vmrs_test_provider().unwrap()
+}
+
 #[test]
 fn bin_vsv_can_be_loaded() {
-    let file_paths = get_test_bin_vsv_file_paths();
-    let provider = VmSavedStateDumpProvider::load_bin_vsv(&file_paths.0, &file_paths.1);
+    let provider = try_get_bin_vsv_test_provider();
     assert!(provider.is_ok());
 }
 
 #[test]
+fn wrong_path_bin_vsv_cant_be_loaded() {
+    let provider = VmSavedStateDumpProvider::load_bin_vsv("some_wrong_path.bin", "some_wrong_path.vsv");
+    assert!(provider.is_err());
+    assert_eq!(ResultCode::FileNotFound, provider.unwrap_err());
+}
+
+#[test]
 fn vmrs_file_can_be_loaded() {
-    let file_path = get_test_vmrs_file_path();
-    let provider = VmSavedStateDumpProvider::load_vmrs(&file_path);
+    let provider = try_get_vmrs_test_provider();
     assert!(provider.is_ok());
+}
+
+#[test]
+fn wrong_path_vmrs_file_cant_be_loaded() {
+    let provider = VmSavedStateDumpProvider::load_vmrs("some_wrong_path.vmrs");
+    assert!(provider.is_err());
+    assert_eq!(ResultCode::FileNotFound, provider.unwrap_err());
+}
+
+#[test]
+fn bin_vsv_get_vp_count() {
+    let provider = get_bin_vsv_test_provider();
+    let vp_count = provider.vp_count();
+    assert_eq!(1, vp_count.unwrap());
+}
+
+#[test]
+fn vmrs_get_vp_count() {
+    let provider = get_vmrs_test_provider();
+    let vp_count = provider.vp_count();
+    assert_eq!(1, vp_count.unwrap());
 }
