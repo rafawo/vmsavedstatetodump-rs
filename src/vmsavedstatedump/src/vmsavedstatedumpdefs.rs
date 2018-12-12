@@ -269,6 +269,6 @@ impl std::fmt::Debug for RegisterRawId {
 #[derive(Debug, Copy, Clone)]
 pub struct VirtualProcessorRegister {
     pub architecture: VirtualProcessorArch,
-    pub register_value: u64,
+    pub value: u64,
     pub raw_id: RegisterRawId,
 }

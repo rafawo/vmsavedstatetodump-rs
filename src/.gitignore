@@ -10,4 +10,4 @@ Cargo.lock
 **/*.rs.bk
 
 # Ignore dll for tests
-**/vmsavedstatedumpprovider.dll
+**/vmsavedstatedumpprovider.*

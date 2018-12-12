@@ -6,6 +6,7 @@
 //!
 
 use std::path::{Path, PathBuf};
+use vmsavedstatedump_rs::vmsavedstatedumpdefs::*;
 use vmsavedstatedump_rs::vmsavedstatedumpprovider::*;
 
 fn get_test_bin_vsv_file_paths() -> (String, String) {
@@ -59,7 +60,8 @@ fn bin_vsv_can_be_loaded() {
 
 #[test]
 fn wrong_path_bin_vsv_cant_be_loaded() {
-    let provider = VmSavedStateDumpProvider::load_bin_vsv("some_wrong_path.bin", "some_wrong_path.vsv");
+    let provider =
+        VmSavedStateDumpProvider::load_bin_vsv("some_wrong_path.bin", "some_wrong_path.vsv");
     assert!(provider.is_err());
     assert_eq!(ResultCode::FileNotFound, provider.unwrap_err());
 }
@@ -79,7 +81,6 @@ fn wrong_path_vmrs_file_cant_be_loaded() {
 
 fn validate_vp_count(provider: &VmSavedStateDumpProvider) {
     let vp_count = provider.vp_count();
-    assert!(vp_count.is_ok());
     assert_eq!(4, vp_count.unwrap());
 }
 
@@ -93,4 +94,42 @@ fn bin_vsv_get_vp_count() {
 fn vmrs_get_vp_count() {
     let provider = get_vmrs_test_provider();
     validate_vp_count(&provider);
+}
+
+fn validate_get_architecture(provider: &VmSavedStateDumpProvider) {
+    let architecture = provider.get_vp_architecture(0);
+    assert_eq!(VirtualProcessorArch::X86, architecture.unwrap());
+}
+
+#[test]
+fn bin_vsv_get_architecture() {
+    let provider = get_bin_vsv_test_provider();
+    validate_get_architecture(&provider);
+}
+
+#[test]
+fn vmrs_get_architecture() {
+    let provider = get_vmrs_test_provider();
+    validate_get_architecture(&provider);
+}
+
+fn validate_get_register_value(provider: &VmSavedStateDumpProvider) {
+    let register_id = RegisterRawId {
+        register_id_x64: RegisterIdx64::Cr3,
+    };
+
+    let register = provider.get_vp_register_value(0, VirtualProcessorArch::X86, register_id);
+    assert_eq!(4294905840, register.unwrap().value);
+}
+
+#[test]
+fn bin_vsv_get_register_value() {
+    let provider = get_bin_vsv_test_provider();
+    validate_get_register_value(&provider);
+}
+
+#[test]
+fn vmrs_get_register_value() {
+    let provider = get_vmrs_test_provider();
+    validate_get_register_value(&provider);
 }

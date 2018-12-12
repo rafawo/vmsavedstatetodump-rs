@@ -154,7 +154,7 @@ impl VmSavedStateDumpProvider {
     ) -> Result<VirtualProcessorRegister, ResultCode> {
         let mut vp_register_value: VirtualProcessorRegister = VirtualProcessorRegister {
             architecture: arch,
-            register_value: 0,
+            value: 0,
             raw_id: register_id,
         };
         let result: HResult;
