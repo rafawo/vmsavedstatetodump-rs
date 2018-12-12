@@ -14,5 +14,6 @@ fn get_test_file_path() -> String {
 #[test]
 fn vmrs_file_can_be_opened() {
     let file_path = get_test_file_path();
-    let _provider = VmSavedStateDumpProvider::load_vmrs(&file_path);
+    let provider = VmSavedStateDumpProvider::load_vmrs(&file_path);
+    assert!(provider.is_ok());
 }
