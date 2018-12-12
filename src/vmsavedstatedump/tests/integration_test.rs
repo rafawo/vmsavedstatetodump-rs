@@ -73,16 +73,20 @@ fn wrong_path_vmrs_file_cant_be_loaded() {
     assert_eq!(ResultCode::FileNotFound, provider.unwrap_err());
 }
 
+fn validate_vp_count(provider: &VmSavedStateDumpProvider) {
+    let vp_count = provider.vp_count();
+    assert!(vp_count.is_ok());
+    assert_eq!(1, vp_count.unwrap());
+}
+
 #[test]
 fn bin_vsv_get_vp_count() {
     let provider = get_bin_vsv_test_provider();
-    let vp_count = provider.vp_count();
-    assert_eq!(1, vp_count.unwrap());
+    validate_vp_count(&provider);
 }
 
 #[test]
 fn vmrs_get_vp_count() {
     let provider = get_vmrs_test_provider();
-    let vp_count = provider.vp_count();
-    assert_eq!(1, vp_count.unwrap());
+    validate_vp_count(&provider);
 }
