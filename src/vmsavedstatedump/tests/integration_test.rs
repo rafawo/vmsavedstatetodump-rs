@@ -1,5 +1,9 @@
 //! There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
 //! saved state files from being loaded in sequence, reusing the same handle.
+//!
+//! A fix has been made, but won't be until the next official release of the windows
+//! 10 SDK. As a workaround, a private fix can be found in https://1drv.ms/u/s!ArJxuNplQduwr8V4AuAELz2KE6SLvQ
+//!
 
 use std::path::{Path, PathBuf};
 use vmsavedstatedump_rs::vmsavedstatedumpprovider::*;
@@ -76,7 +80,7 @@ fn wrong_path_vmrs_file_cant_be_loaded() {
 fn validate_vp_count(provider: &VmSavedStateDumpProvider) {
     let vp_count = provider.vp_count();
     assert!(vp_count.is_ok());
-    assert_eq!(1, vp_count.unwrap());
+    assert_eq!(4, vp_count.unwrap());
 }
 
 #[test]
