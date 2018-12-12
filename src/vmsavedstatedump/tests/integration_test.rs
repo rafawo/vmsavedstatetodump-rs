@@ -1,3 +1,6 @@
+//! There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
+//! saved state files from being loaded in sequence, reusing the same handle.
+
 use std::path::{Path, PathBuf};
 use vmsavedstatedump_rs::vmsavedstatedumpprovider::*;
 
