@@ -6,8 +6,8 @@
 //! `WIN10SDK_VERSION` defaults to `10.0.17763.0` if not set.
 
 use std::env::var;
-use std::path::{ Path, PathBuf };
 use std::fs;
+use std::path::{Path, PathBuf};
 
 pub fn deploy_dll() {
     let root_win10_sdk_path = match var("WIN10SDK_PATH") {
@@ -34,9 +34,15 @@ pub fn deploy_dll() {
 
     if !destination.exists() {
         fs::copy(&dll_path, &destination).unwrap();
-        println!("cargo:vmsavedstatedump-rs-dll-copied-to={}", destination.to_str().unwrap());
+        println!(
+            "cargo:vmsavedstatedump-rs-dll-copied-to={}",
+            destination.to_str().unwrap()
+        );
     } else {
-        println!("cargo:vmsavedstatedump-rs-dll-already-exists-in-destination={}", destination.to_str().unwrap());
+        println!(
+            "cargo:vmsavedstatedump-rs-dll-already-exists-in-destination={}",
+            destination.to_str().unwrap()
+        );
     }
 }
 
