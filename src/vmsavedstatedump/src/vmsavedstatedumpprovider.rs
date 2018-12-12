@@ -86,7 +86,7 @@ impl VmSavedStateDumpProvider {
 
     /// Loads a VMRS VM Saved state file and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_saved_state_file(vmrs: &str) -> Result<VmSavedStateDumpProvider, ResultCode> {
+    pub fn load_vmrs(vmrs: &str) -> Result<VmSavedStateDumpProvider, ResultCode> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
