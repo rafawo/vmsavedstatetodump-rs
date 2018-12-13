@@ -201,3 +201,24 @@ fn guest_physical_memory_chunks() {
         memory_chunks[0]
     );
 }
+
+#[test]
+fn guest_raw_saved_memory() {
+    let provider = get_vmrs_test_provider();
+    let raw_memory_size = provider.guest_raw_saved_memory_size().unwrap();
+    assert_eq!(264241152, raw_memory_size);
+
+    let mut buffer: Vec<u8> = Vec::new();
+    buffer.resize(1024 * 1024, 0);
+
+    let mut offset: u64 = 0;
+    let mut bytes_read = provider.read_guest_raw_saved_memory(offset, buffer.as_mut_slice()).unwrap() as u64;
+    offset += bytes_read;
+
+    while bytes_read == 1024 * 1024 {
+        bytes_read = provider.read_guest_raw_saved_memory(offset, buffer.as_mut_slice()).unwrap() as u64;
+        offset += bytes_read;
+    }
+
+    assert_eq!(raw_memory_size, offset);
+}
