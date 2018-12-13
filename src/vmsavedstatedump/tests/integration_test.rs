@@ -227,8 +227,10 @@ fn guest_raw_saved_memory() {
 
     assert_eq!(raw_memory_size, offset);
 
+    // Because the test file has only one memory chunk sized, the translation
+    // from physical address to raw saved memory offset corresponds to the same value
     assert_eq!(
-        790526,
+        0xC0FFE,
         provider
             .guest_physical_address_to_raw_saved_memory_offset(0xC0FFE)
             .unwrap()
