@@ -368,12 +368,13 @@ impl<'a> Iterator for VirtualProcessorIter<'a> {
     type Item = VirtualProcessor<'a>;
 
     fn next(&mut self) -> Option<VirtualProcessor<'a>> {
+        let vp_id = self.current_id;
         self.current_id += 1;
 
-        if self.current_id < self.count {
+        if vp_id < self.count {
             Some(VirtualProcessor {
                 provider: &self.provider,
-                id: self.current_id,
+                id: vp_id,
             })
         } else {
             None
@@ -382,6 +383,11 @@ impl<'a> Iterator for VirtualProcessorIter<'a> {
 }
 
 impl<'a> VirtualProcessor<'a> {
+    /// Returns the id of a virtual processor.
+    pub fn id(&self) -> u32 {
+        self.id
+    }
+
     /// Returns the architecture of a given virtual processor.
     pub fn architecture(&self) -> Result<VirtualProcessorArch, ResultCode> {
         self.provider.get_vp_architecture(self.id)

@@ -115,11 +115,11 @@ fn vmrs_get_architecture() {
 
 fn validate_get_register_value(provider: &VmSavedStateDumpProvider) {
     let register_id = RegisterRawId {
-        register_id_x64: RegisterIdx64::Cr3,
+        register_id_x86: RegisterIdx86::Ecx,
     };
 
     let register = provider.get_vp_register_value(0, VirtualProcessorArch::X86, register_id);
-    assert_eq!(4294905840, register.unwrap().value);
+    assert_eq!(4, register.unwrap().value);
 }
 
 #[test]
@@ -149,4 +149,34 @@ fn bin_vsv_get_paging_mode() {
 fn vmrs_get_paging_mode() {
     let provider = get_vmrs_test_provider();
     validate_get_paging_mode(&provider);
+}
+
+#[test]
+fn vp_iterator() {
+    let provider = get_vmrs_test_provider();
+    let vp_iter = provider.vp_iter();
+    let mut vp_id = 0;
+    let register_id = RegisterRawId {
+        register_id_x86: RegisterIdx86::Ecx,
+    };
+
+    assert_eq!(4, provider.vp_count().unwrap());
+
+    for vp in vp_iter {
+        assert_eq!(vp_id, vp.id());
+        println!("Iterating in vp {}", vp_id);
+        assert_eq!(VirtualProcessorArch::X86, vp.architecture().unwrap());
+        assert_eq!(PagingMode::Bit32, vp.paging_mode().unwrap());
+
+        // Each vp has its own register value
+        let register_value = match vp_id {
+            0 => 4,
+            _ => 0,
+        };
+
+        assert_eq!(register_value, vp.register_value(VirtualProcessorArch::X86, register_id).unwrap().value);
+        vp_id += 1;
+    }
+
+    assert_eq!(4, vp_id);
 }
