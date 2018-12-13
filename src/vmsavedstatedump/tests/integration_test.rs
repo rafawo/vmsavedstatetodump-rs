@@ -236,3 +236,45 @@ fn guest_raw_saved_memory() {
             .unwrap()
     );
 }
+
+#[test]
+fn read_physical_address() {
+    let provider = get_vmrs_test_provider();
+
+    // Because the test file comes from a VM without a guest,
+    // virtual to physical address translation can't really happen
+    // because the physical memory is missing basic page tables.
+    // So we at least verify a translation fails.
+    assert!(provider
+        .guest_virtual_to_physical_address(0, 0xC0FFE)
+        .is_err());
+
+    #[repr(C)]
+    #[derive(Debug, PartialEq)]
+    struct FakeStruct {
+        x: u32,
+        y: u32,
+        z: u32,
+    }
+
+    let mut fake_struct: FakeStruct = FakeStruct { x: 0, y: 0, z: 0 };
+    const FAKE_STRUCT_SIZE: usize = std::mem::size_of::<FakeStruct>();
+    let slice = unsafe {
+        std::mem::transmute::<&mut FakeStruct, &mut [u8; FAKE_STRUCT_SIZE]>(&mut fake_struct)
+    };
+
+    assert_eq!(slice.len(), FAKE_STRUCT_SIZE);
+    let bytes_read = provider
+        .read_guest_physical_address(0xC0FFE, slice)
+        .unwrap();
+
+    assert_eq!(FAKE_STRUCT_SIZE as u32, bytes_read);
+    assert_eq!(
+        FakeStruct {
+            x: 75826887,
+            y: 1235222542,
+            z: 3439375364
+        },
+        fake_struct
+    );
+}
