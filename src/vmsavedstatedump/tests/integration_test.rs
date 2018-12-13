@@ -174,9 +174,30 @@ fn vp_iterator() {
             _ => 0,
         };
 
-        assert_eq!(register_value, vp.register_value(VirtualProcessorArch::X86, register_id).unwrap().value);
+        assert_eq!(
+            register_value,
+            vp.register_value(VirtualProcessorArch::X86, register_id)
+                .unwrap()
+                .value
+        );
         vp_id += 1;
     }
 
     assert_eq!(4, vp_id);
+}
+
+#[test]
+fn guest_physical_memory_chunks() {
+    let provider = get_vmrs_test_provider();
+    let (page_size, memory_chunks) = provider.guest_physical_memory_chunks().unwrap();
+    println!("{:?} - {:?}", page_size, memory_chunks);
+    assert_eq!(4096, page_size);
+    assert_eq!(1, memory_chunks.len());
+    assert_eq!(
+        GpaMemoryChunk {
+            guest_physical_start_page_index: 0,
+            page_count: 64512,
+        },
+        memory_chunks[0]
+    );
 }
