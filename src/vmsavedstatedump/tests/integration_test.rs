@@ -133,3 +133,20 @@ fn vmrs_get_register_value() {
     let provider = get_vmrs_test_provider();
     validate_get_register_value(&provider);
 }
+
+fn validate_get_paging_mode(provider: &VmSavedStateDumpProvider) {
+    let paging_mode = provider.get_vp_paging_mode(0);
+    assert_eq!(PagingMode::Bit32, paging_mode.unwrap());
+}
+
+#[test]
+fn bin_vsv_get_paging_mode() {
+    let provider = get_bin_vsv_test_provider();
+    validate_get_paging_mode(&provider);
+}
+
+#[test]
+fn vmrs_get_paging_mode() {
+    let provider = get_vmrs_test_provider();
+    validate_get_paging_mode(&provider);
+}
