@@ -226,4 +226,11 @@ fn guest_raw_saved_memory() {
     }
 
     assert_eq!(raw_memory_size, offset);
+
+    assert_eq!(
+        790526,
+        provider
+            .guest_physical_address_to_raw_saved_memory_offset(0xC0FFE)
+            .unwrap()
+    );
 }
