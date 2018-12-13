@@ -278,3 +278,9 @@ fn read_physical_address() {
         fake_struct
     );
 }
+
+#[test]
+fn apply_replay_log() {
+    let vmrs_file_path = get_test_vmrs_file_path();
+    assert_eq!(Ok(()), apply_pending_replay_log(vmrs_file_path.as_str()));
+}
