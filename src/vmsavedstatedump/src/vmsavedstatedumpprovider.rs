@@ -56,8 +56,9 @@ pub struct VmSavedStateDumpProvider {
 impl ops::Drop for VmSavedStateDumpProvider {
     fn drop(&mut self) {
         unsafe {
-            // We ignore error code on purpose
-            ReleaseSavedStateFiles(self.handle);
+            if hresult_to_result_code(&ReleaseSavedStateFiles(self.handle)) != ResultCode::Success {
+                panic!("Failed to release saved state files");
+            }
         }
     }
 }
