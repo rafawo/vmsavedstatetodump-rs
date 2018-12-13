@@ -190,9 +190,10 @@ fn vp_iterator() {
 fn guest_physical_memory_chunks() {
     let provider = get_vmrs_test_provider();
     let (page_size, memory_chunks) = provider.guest_physical_memory_chunks().unwrap();
-    println!("{:?} - {:?}", page_size, memory_chunks);
+
     assert_eq!(4096, page_size);
     assert_eq!(1, memory_chunks.len());
+
     assert_eq!(
         GpaMemoryChunk {
             guest_physical_start_page_index: 0,
@@ -212,11 +213,15 @@ fn guest_raw_saved_memory() {
     buffer.resize(1024 * 1024, 0);
 
     let mut offset: u64 = 0;
-    let mut bytes_read = provider.read_guest_raw_saved_memory(offset, buffer.as_mut_slice()).unwrap() as u64;
+    let mut bytes_read = provider
+        .read_guest_raw_saved_memory(offset, buffer.as_mut_slice())
+        .unwrap() as u64;
     offset += bytes_read;
 
     while bytes_read == 1024 * 1024 {
-        bytes_read = provider.read_guest_raw_saved_memory(offset, buffer.as_mut_slice()).unwrap() as u64;
+        bytes_read = provider
+            .read_guest_raw_saved_memory(offset, buffer.as_mut_slice())
+            .unwrap() as u64;
         offset += bytes_read;
     }
 
