@@ -18,7 +18,7 @@
 //! of a loaded VM saved state file.
 //!
 //! The best source of code examples on how to use the APIs are the integration tests,
-//! found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/src/vmsavedstatedump-rs/tests/integration_test.rs).
+//! found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/vmsavedstatedump-rs/tests/integration_test.rs).
 
 pub(crate) mod vmsavedstatedump_raw_bindings;
 pub mod vmsavedstatedumpdefs;

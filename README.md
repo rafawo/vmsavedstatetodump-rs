@@ -41,4 +41,4 @@ Once a provider has been instantiated, all of its related APIs can be used in th
 of a loaded VM saved state file.
 
 The best source of code examples on how to use the APIs are the integration tests,
-found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/src/vmsavedstatedump-rs/tests/integration_test.rs).
+found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/vmsavedstatedump-rs/tests/integration_test.rs).
