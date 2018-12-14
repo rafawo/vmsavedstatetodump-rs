@@ -8,6 +8,7 @@ description = "Rust abstractions of VmSavedStateDumpProvider Windows 10 SDK API.
 repository = "https://github.com/rafawo/vmsavedstatedump-rs"
 readme = "README.md"
 keywords = ["windows", "vmsavedstatedump", "hyper-v", "vmrs file"]
+categories = ["api-bindings", "os::windows-apis"]
 build = "build.rs"
 exclude = [
     "vmsavedstatedumpprovider.dll",
