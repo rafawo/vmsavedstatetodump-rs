@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-    "vmsavedstatedump",
+    "vmsavedstatedump-rs",
     "vmsavedstatedumpcli",
 ]

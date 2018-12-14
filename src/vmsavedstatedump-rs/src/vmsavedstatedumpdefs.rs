@@ -2,7 +2,7 @@
 
 use crate::windefs::*;
 
-pub type VmSavedStateDumpHandle = *mut Void;
+pub(crate) type VmSavedStateDumpHandle = *mut Void;
 pub type GuestVirtualAddress = u64;
 pub type GuestPhysicalAddress = u64;
 

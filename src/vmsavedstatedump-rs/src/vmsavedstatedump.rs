@@ -1,12 +1,14 @@
 //! This module implements safe wrappers of the unsafe API surface to VmSavedStateDump.
 //! Defines and provides Rust idiomatic abstractions of the API.
 
-use crate::vmsavedstatedump::*;
 use crate::vmsavedstatedumpdefs::*;
+use crate::vmsavedstatedump_raw_bindings::*;
 use crate::windefs::*;
 
 use std::ops;
+use kernel32::LocalFree;
 use widestring::U16CString;
+use widestring::WideCString;
 
 /// Common result codes that can be returned by the VmSavedStateDumpProvider API.
 #[derive(Debug, PartialEq)]
@@ -30,6 +32,64 @@ fn hresult_to_result_code(hresult: &HResult) -> ResultCode {
         0x80070057 => ResultCode::InvalidArgument,
         0x8000FFFF => ResultCode::Unexpected,
         other => ResultCode::WindowsHResult(other.clone()),
+    }
+}
+
+/// Enum that represents all possible ways a VM Saved state file can be stored
+#[derive(Debug, PartialEq)]
+pub enum VmSavedStateFile {
+    BinVsv(String, String),
+    Vmrs(String),
+}
+
+/// Locates the saved state file(s) for a given VM and/or snapshot. This function uses WMI and the V1 or V2
+/// virtualization namespace. So this is expected to fail if ran on a machine without Hyper-V installed.
+pub fn locate_saved_state_files(vm_name: &str, snapshot_name: &str) -> Result<VmSavedStateFile, ResultCode> {
+    let widestr_bin_file_path: WideCString;
+    let widestr_vsv_file_path: WideCString;
+    let widestr_vmrs_file_path: WideCString;
+    let result: HResult;
+
+    unsafe {
+        let mut bin_file_path_buffer: LPWStr = std::ptr::null_mut();
+        let mut vsv_file_path_buffer: LPWStr = std::ptr::null_mut();
+        let mut vmrs_file_path_buffer: LPWStr = std::ptr::null_mut();
+
+        result = LocateSavedStateFiles(
+            U16CString::from_str(vm_name).unwrap().as_ptr(),
+            U16CString::from_str(snapshot_name).unwrap().as_ptr(),
+            &mut bin_file_path_buffer as *mut LPWStr,
+            &mut vsv_file_path_buffer as *mut LPWStr,
+            &mut vmrs_file_path_buffer as *mut LPWStr,
+        );
+
+        widestr_bin_file_path = WideCString::from_ptr_str(bin_file_path_buffer);
+        LocalFree(bin_file_path_buffer as PVoid);
+
+        widestr_vsv_file_path = WideCString::from_ptr_str(vsv_file_path_buffer);
+        LocalFree(vsv_file_path_buffer as PVoid);
+
+        widestr_vmrs_file_path = WideCString::from_ptr_str(vmrs_file_path_buffer);
+        LocalFree(vmrs_file_path_buffer as PVoid);
+    }
+
+    let bin_file_path = widestr_bin_file_path.to_string_lossy();
+    let vsv_file_path = widestr_vsv_file_path.to_string_lossy();
+    let vmrs_file_path = widestr_vmrs_file_path.to_string_lossy();
+
+    match hresult_to_result_code(&result) {
+        ResultCode::Success => {
+            if vmrs_file_path.is_empty() {
+                if bin_file_path.is_empty() || vsv_file_path.is_empty() {
+                    Err(ResultCode::FileNotFound)
+                } else {
+                    Ok(VmSavedStateFile::BinVsv(bin_file_path, vsv_file_path))
+                }
+            } else {
+                Ok(VmSavedStateFile::Vmrs(vmrs_file_path))
+            }
+        },
+        error => Err(error),
     }
 }
 
