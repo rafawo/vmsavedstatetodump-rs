@@ -1,12 +1,12 @@
 //! This module implements safe wrappers of the unsafe API surface to VmSavedStateDump.
 //! Defines and provides Rust idiomatic abstractions of the API.
 
-use crate::vmsavedstatedumpdefs::*;
 use crate::vmsavedstatedump_raw_bindings::*;
+use crate::vmsavedstatedumpdefs::*;
 use crate::windefs::*;
 
-use std::ops;
 use kernel32::LocalFree;
+use std::ops;
 use widestring::U16CString;
 use widestring::WideCString;
 
@@ -44,7 +44,10 @@ pub enum VmSavedStateFile {
 
 /// Locates the saved state file(s) for a given VM and/or snapshot. This function uses WMI and the V1 or V2
 /// virtualization namespace. So this is expected to fail if ran on a machine without Hyper-V installed.
-pub fn locate_saved_state_files(vm_name: &str, snapshot_name: &str) -> Result<VmSavedStateFile, ResultCode> {
+pub fn locate_saved_state_files(
+    vm_name: &str,
+    snapshot_name: &str,
+) -> Result<VmSavedStateFile, ResultCode> {
     let widestr_bin_file_path: WideCString;
     let widestr_vsv_file_path: WideCString;
     let widestr_vmrs_file_path: WideCString;
@@ -88,7 +91,7 @@ pub fn locate_saved_state_files(vm_name: &str, snapshot_name: &str) -> Result<Vm
             } else {
                 Ok(VmSavedStateFile::Vmrs(vmrs_file_path))
             }
-        },
+        }
         error => Err(error),
     }
 }

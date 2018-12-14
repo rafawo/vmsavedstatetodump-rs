@@ -20,9 +20,9 @@
 //! The best source of code examples on how to use the APIs are the integration tests,
 //! found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/vmsavedstatedump-rs/tests/integration_test.rs).
 
+pub mod vmsavedstatedump;
 pub(crate) mod vmsavedstatedump_raw_bindings;
 pub mod vmsavedstatedumpdefs;
-pub mod vmsavedstatedump;
 
 pub(crate) mod windefs {
     use libc;
