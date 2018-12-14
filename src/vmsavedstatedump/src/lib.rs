@@ -1,8 +1,8 @@
-pub mod vmsavedstatedump;
+pub(crate) mod vmsavedstatedump_raw_bindings;
 pub mod vmsavedstatedumpdefs;
-pub mod vmsavedstatedumpprovider;
+pub mod vmsavedstatedump;
 
-pub mod windefs {
+pub(crate) mod windefs {
     use libc;
 
     pub type DWord = libc::c_ulong;
