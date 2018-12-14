@@ -9,6 +9,10 @@ repository = "https://github.com/rafawo/vmsavedstatedump-rs"
 readme = "README.md"
 keywords = ["windows", "vmsavedstatedump", "hyper-v", "vmrs file"]
 build = "build.rs"
+exclude = [
+    "vmsavedstatedumpprovider.dll",
+    "vmsavedstatedumpprovider.pdb",
+]
 
 [dependencies]
 libc = "0.2.44"
