@@ -7,7 +7,7 @@
 
 use std::path::{Path, PathBuf};
 use vmsavedstatedump_rs::vmsavedstatedumpdefs::*;
-use vmsavedstatedump_rs::vmsavedstatedumpprovider::*;
+use vmsavedstatedump_rs::vmsavedstatedump::*;
 
 fn get_test_bin_vsv_file_paths() -> (String, String) {
     let mut bin_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
