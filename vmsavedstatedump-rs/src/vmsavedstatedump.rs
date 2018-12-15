@@ -1,7 +1,7 @@
 //! This module implements safe wrappers of the unsafe API surface to VmSavedStateDump.
 //! Defines and provides Rust idiomatic abstractions of the API.
 
-use crate::vmsavedstatedump_raw_bindings::*;
+use crate::vmsavedstatedump_bindings::*;
 use crate::vmsavedstatedumpdefs::*;
 use crate::windefs::*;
 

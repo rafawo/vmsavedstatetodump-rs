@@ -21,7 +21,7 @@
 //! found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/vmsavedstatedump-rs/tests/integration_test.rs).
 
 pub mod vmsavedstatedump;
-pub(crate) mod vmsavedstatedump_raw_bindings;
+pub(crate) mod vmsavedstatedump_bindings;
 pub mod vmsavedstatedumpdefs;
 
 pub(crate) mod windefs {
