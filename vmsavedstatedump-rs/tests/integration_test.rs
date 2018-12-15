@@ -13,12 +13,10 @@ fn get_test_bin_vsv_file_paths() -> (String, String) {
     let mut bin_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     bin_file_path.push("tests\\test_file.bin");
     assert!(Path::new(&bin_file_path).exists());
-    println!("Test file path: {}", bin_file_path.to_str().unwrap());
 
     let mut vsv_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     vsv_file_path.push("tests\\test_file.vsv");
     assert!(Path::new(&vsv_file_path).exists());
-    println!("Test file path: {}", vsv_file_path.to_str().unwrap());
 
     (
         String::from(bin_file_path.to_str().unwrap()),
@@ -30,7 +28,6 @@ fn get_test_vmrs_file_path() -> String {
     let mut vmrs_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     vmrs_file_path.push("tests\\test_file.vmrs");
     assert!(Path::new(&vmrs_file_path).exists());
-    println!("Test file path: {}", vmrs_file_path.to_str().unwrap());
     String::from(vmrs_file_path.to_str().unwrap())
 }
 
@@ -281,6 +278,14 @@ fn read_physical_address() {
 
 #[test]
 fn apply_replay_log() {
-    let vmrs_file_path = get_test_vmrs_file_path();
-    assert_eq!(Ok(()), apply_pending_replay_log(vmrs_file_path.as_str()));
+    // This test case needs to run with its own test file
+    // because the apply_pending_replay_log API opens the file exclusively,
+    // and test_file.vmrs is shared amongst all other test cases running in parallel
+    let mut vmrs_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    vmrs_file_path.push("tests\\test_file.apply_pending_replay_log.vmrs");
+    assert!(Path::new(&vmrs_file_path).exists());
+    assert_eq!(
+        Ok(()),
+        apply_pending_replay_log(vmrs_file_path.to_str().unwrap())
+    );
 }
