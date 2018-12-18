@@ -1,5 +1,21 @@
-[workspace]
-members = [
-    "vmsavedstatedump-rs",
-    "vmsavedstatedumpcli",
+[package]
+name = "vmsavedstatedump_rs"
+version = "0.1.1"
+authors = ["rafawo <rafawo1@hotmail.com>"]
+license = "MIT OR Apache-2.0"
+edition = "2018"
+description = "Rust abstractions of VmSavedStateDumpProvider Windows 10 SDK API."
+repository = "https://github.com/rafawo/vmsavedstatetodump-rs"
+readme = "../README.md"
+keywords = ["windows", "vmsavedstatedump", "hyper-v", "vmrs"]
+categories = ["api-bindings", "os::windows-apis"]
+build = "build.rs"
+exclude = [
+    "vmsavedstatedumpprovider.dll",
+    "vmsavedstatedumpprovider.pdb",
 ]
+
+[dependencies]
+libc = "0.2.44"
+kernel32-sys = "0.2.2"
+widestring = "0.4.0"

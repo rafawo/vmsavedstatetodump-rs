@@ -1,8 +1,0 @@
-[package]
-name = "vmsavedstatedumpcli"
-version = "0.1.0"
-authors = ["Rafael Alcaraz Mercado <ramerc@microsoft.com>"]
-edition = "2018"
-publish = false
-
-[dependencies]
