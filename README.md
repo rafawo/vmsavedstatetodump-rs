@@ -1,4 +1,4 @@
-# vmsavedstatetodumprs
+# vmsavedstatetodump-rs
 Rust wrapper of VmSavedStateDump
 
 ## Overview
