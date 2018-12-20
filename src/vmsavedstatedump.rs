@@ -5,7 +5,6 @@ use crate::vmsavedstatedump_bindings::*;
 use crate::vmsavedstatedumpdefs::*;
 use crate::windefs::*;
 
-use kernel32::LocalFree;
 use std::ops;
 use widestring::U16CString;
 use widestring::WideCString;
@@ -67,13 +66,13 @@ pub fn locate_saved_state_files(
         );
 
         widestr_bin_file_path = WideCString::from_ptr_str(bin_file_path_buffer);
-        LocalFree(bin_file_path_buffer as PVoid);
+        winapi::um::winbase::LocalFree(bin_file_path_buffer as *mut winapi::ctypes::c_void);
 
         widestr_vsv_file_path = WideCString::from_ptr_str(vsv_file_path_buffer);
-        LocalFree(vsv_file_path_buffer as PVoid);
+        winapi::um::winbase::LocalFree(vsv_file_path_buffer as *mut winapi::ctypes::c_void);
 
         widestr_vmrs_file_path = WideCString::from_ptr_str(vmrs_file_path_buffer);
-        LocalFree(vmrs_file_path_buffer as PVoid);
+        winapi::um::winbase::LocalFree(vmrs_file_path_buffer as *mut winapi::ctypes::c_void);
     }
 
     let bin_file_path = widestr_bin_file_path.to_string_lossy();
