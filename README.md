@@ -42,3 +42,33 @@ of a loaded VM saved state file.
 
 The best source of code examples on how to use the APIs are the integration tests,
 found [here](https://github.com/rafawo/vmsavedstatetodump-rs/blob/master/vmsavedstatedump-rs/tests/integration_test.rs).
+
+## How to use locally
+
+Clone the repo to a folder:
+
+```
+git clone https://github.com/rafawo/vmsavedstatetodump-rs.git
+```
+
+Make sure the machine where you are building has Windows 10 SDK version Windows 10 SDK version **10.0.17763.132** installed. Then run:
+
+```
+cd vmsavedstatetodump-rs
+cargo build
+```
+
+Open documentation by running:
+```
+cargo doc --open
+```
+
+Finally, the build process should have copied `vmsavedstatedumpprovider.dll` to the root directory. Run tests by running:
+```
+cargo test
+```
+
+**NOTE:There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
+saved state files from being loaded in sequence, reusing the same handle.
+A fix has been made, but won't be in until the next official release of the windows 10 SDK.
+As a workaround, a private fix can be found in https://1drv.ms/u/s!ArJxuNplQduwr8V4AuAELz2KE6SLvQ**
