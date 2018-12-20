@@ -6,8 +6,6 @@ use crate::vmsavedstatedumpdefs::*;
 use crate::windefs::*;
 
 use std::ops;
-use widestring::U16CString;
-use widestring::WideCString;
 
 /// Common result codes that can be returned by the VmSavedStateDumpProvider API.
 #[derive(Debug, PartialEq)]
@@ -47,9 +45,9 @@ pub fn locate_saved_state_files(
     vm_name: &str,
     snapshot_name: &str,
 ) -> Result<VmSavedStateFile, ResultCode> {
-    let widestr_bin_file_path: WideCString;
-    let widestr_vsv_file_path: WideCString;
-    let widestr_vmrs_file_path: WideCString;
+    let widestr_bin_file_path: widestring::WideCString;
+    let widestr_vsv_file_path: widestring::WideCString;
+    let widestr_vmrs_file_path: widestring::WideCString;
     let result: HResult;
 
     unsafe {
@@ -58,20 +56,20 @@ pub fn locate_saved_state_files(
         let mut vmrs_file_path_buffer: LPWStr = std::ptr::null_mut();
 
         result = LocateSavedStateFiles(
-            U16CString::from_str(vm_name).unwrap().as_ptr(),
-            U16CString::from_str(snapshot_name).unwrap().as_ptr(),
+            widestring::WideCString::from_str(vm_name).unwrap().as_ptr(),
+            widestring::WideCString::from_str(snapshot_name).unwrap().as_ptr(),
             &mut bin_file_path_buffer as *mut LPWStr,
             &mut vsv_file_path_buffer as *mut LPWStr,
             &mut vmrs_file_path_buffer as *mut LPWStr,
         );
 
-        widestr_bin_file_path = WideCString::from_ptr_str(bin_file_path_buffer);
+        widestr_bin_file_path = widestring::WideCString::from_ptr_str(bin_file_path_buffer);
         winapi::um::winbase::LocalFree(bin_file_path_buffer as *mut winapi::ctypes::c_void);
 
-        widestr_vsv_file_path = WideCString::from_ptr_str(vsv_file_path_buffer);
+        widestr_vsv_file_path = widestring::WideCString::from_ptr_str(vsv_file_path_buffer);
         winapi::um::winbase::LocalFree(vsv_file_path_buffer as *mut winapi::ctypes::c_void);
 
-        widestr_vmrs_file_path = WideCString::from_ptr_str(vmrs_file_path_buffer);
+        widestr_vmrs_file_path = widestring::WideCString::from_ptr_str(vmrs_file_path_buffer);
         winapi::um::winbase::LocalFree(vmrs_file_path_buffer as *mut winapi::ctypes::c_void);
     }
 
@@ -100,7 +98,7 @@ pub fn apply_pending_replay_log(vmrs: &str) -> Result<(), ResultCode> {
     let result: HResult;
 
     unsafe {
-        result = ApplyPendingSavedStateFileReplayLog(U16CString::from_str(vmrs).unwrap().as_ptr())
+        result = ApplyPendingSavedStateFileReplayLog(widestring::WideCString::from_str(vmrs).unwrap().as_ptr())
     }
 
     match hresult_to_result_code(&result) {
@@ -134,8 +132,8 @@ impl VmSavedStateDumpProvider {
 
         unsafe {
             result = LoadSavedStateFiles(
-                U16CString::from_str(bin).unwrap().as_ptr(),
-                U16CString::from_str(vsv).unwrap().as_ptr(),
+                widestring::WideCString::from_str(bin).unwrap().as_ptr(),
+                widestring::WideCString::from_str(vsv).unwrap().as_ptr(),
                 &mut dump_handle,
             );
         }
@@ -156,7 +154,7 @@ impl VmSavedStateDumpProvider {
 
         unsafe {
             result = LoadSavedStateFile(
-                U16CString::from_str(vmrs).unwrap().as_ptr(),
+                widestring::WideCString::from_str(vmrs).unwrap().as_ptr(),
                 &mut dump_handle,
             );
         }
