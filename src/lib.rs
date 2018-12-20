@@ -24,13 +24,14 @@ pub mod vmsavedstatedump;
 pub(crate) mod vmsavedstatedump_bindings;
 pub mod vmsavedstatedumpdefs;
 
-pub(crate) mod windefs {
-    use libc;
 
-    pub type DWord = libc::c_ulong;
-    pub type HResult = libc::c_long;
-    pub type LPCWStr = *const libc::wchar_t;
-    pub type LPWStr = *mut libc::wchar_t;
-    pub type PVoid = *mut Void;
-    pub type Void = libc::c_void;
+/// Module that declares aliases to windows definitions used by this crate
+/// using Rust's naming conventions.
+pub(crate) mod windefs {
+    pub type DWord = winapi::shared::minwindef::DWORD;
+    pub type HResult = winapi::shared::ntdef::HRESULT;
+    pub type LPCWStr = winapi::shared::ntdef::LPCWSTR;
+    pub type LPWStr = winapi::shared::ntdef::LPWSTR;
+    pub type PVoid = winapi::shared::ntdef::PVOID;
+    pub type Void = winapi::shared::ntdef::VOID;
 }

@@ -64,13 +64,13 @@ pub fn locate_saved_state_files(
         );
 
         widestr_bin_file_path = widestring::WideCString::from_ptr_str(bin_file_path_buffer);
-        winapi::um::winbase::LocalFree(bin_file_path_buffer as *mut winapi::ctypes::c_void);
+        winapi::um::winbase::LocalFree(bin_file_path_buffer as PVoid);
 
         widestr_vsv_file_path = widestring::WideCString::from_ptr_str(vsv_file_path_buffer);
-        winapi::um::winbase::LocalFree(vsv_file_path_buffer as *mut winapi::ctypes::c_void);
+        winapi::um::winbase::LocalFree(vsv_file_path_buffer as PVoid);
 
         widestr_vmrs_file_path = widestring::WideCString::from_ptr_str(vmrs_file_path_buffer);
-        winapi::um::winbase::LocalFree(vmrs_file_path_buffer as *mut winapi::ctypes::c_void);
+        winapi::um::winbase::LocalFree(vmrs_file_path_buffer as PVoid);
     }
 
     let bin_file_path = widestr_bin_file_path.to_string_lossy();
