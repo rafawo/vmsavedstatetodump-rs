@@ -40,7 +40,7 @@ fn get_test_vmrs_file_path() -> String {
     String::from(vmrs_file_path.to_str().unwrap())
 }
 
-fn try_get_bin_vsv_test_provider() -> Result<VmSavedStateDumpProvider, ResultCode> {
+fn try_get_bin_vsv_test_provider() -> VmSavedStateDumpResult<VmSavedStateDumpProvider> {
     let file_paths = get_test_bin_vsv_file_paths();
     VmSavedStateDumpProvider::load_bin_vsv(&file_paths.0, &file_paths.1)
 }
@@ -49,7 +49,7 @@ fn get_bin_vsv_test_provider() -> VmSavedStateDumpProvider {
     try_get_bin_vsv_test_provider().unwrap()
 }
 
-fn try_get_vmrs_test_provider() -> Result<VmSavedStateDumpProvider, ResultCode> {
+fn try_get_vmrs_test_provider() -> VmSavedStateDumpResult<VmSavedStateDumpProvider> {
     let file_path = get_test_vmrs_file_path();
     VmSavedStateDumpProvider::load_vmrs(&file_path)
 }

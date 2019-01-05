@@ -15,6 +15,8 @@ use crate::windefs::*;
 
 use std::ops;
 
+pub type VmSavedStateDumpResult<T> = Result<T, ResultCode>;
+
 /// Common result codes that can be returned by the VmSavedStateDumpProvider API.
 #[derive(Debug, PartialEq)]
 pub enum ResultCode {
@@ -52,7 +54,7 @@ pub enum VmSavedStateFile {
 pub fn locate_saved_state_files(
     vm_name: &str,
     snapshot_name: &str,
-) -> Result<VmSavedStateFile, ResultCode> {
+) -> VmSavedStateDumpResult<VmSavedStateFile> {
     let widestr_bin_file_path: widestring::WideCString;
     let widestr_vsv_file_path: widestring::WideCString;
     let widestr_vmrs_file_path: widestring::WideCString;
@@ -102,7 +104,7 @@ pub fn locate_saved_state_files(
 }
 
 /// Applies a pending replay log to a VMRS file.
-pub fn apply_pending_replay_log(vmrs: &str) -> Result<(), ResultCode> {
+pub fn apply_pending_replay_log(vmrs: &str) -> VmSavedStateDumpResult<()> {
     let result: HResult;
 
     unsafe {
@@ -134,7 +136,7 @@ impl ops::Drop for VmSavedStateDumpProvider {
 impl VmSavedStateDumpProvider {
     /// Loads a BIN/VSV VM Saved state files and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_bin_vsv(bin: &str, vsv: &str) -> Result<VmSavedStateDumpProvider, ResultCode> {
+    pub fn load_bin_vsv(bin: &str, vsv: &str) -> VmSavedStateDumpResult<VmSavedStateDumpProvider> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
@@ -156,7 +158,7 @@ impl VmSavedStateDumpProvider {
 
     /// Loads a VMRS VM Saved state file and returns a VmSavedStateDumpProvider instance
     /// that provides the interface to the dump related APIs.
-    pub fn load_vmrs(vmrs: &str) -> Result<VmSavedStateDumpProvider, ResultCode> {
+    pub fn load_vmrs(vmrs: &str) -> VmSavedStateDumpResult<VmSavedStateDumpProvider> {
         let mut dump_handle: VmSavedStateDumpHandle = std::ptr::null_mut();
         let result: HResult;
 
@@ -176,7 +178,7 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns the virtual processor count.
-    pub fn vp_count(&self) -> Result<u32, ResultCode> {
+    pub fn vp_count(&self) -> VmSavedStateDumpResult<u32> {
         let mut vp_count = 0;
         let result: HResult;
 
@@ -200,7 +202,7 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns the virtual processor architecture.
-    pub fn get_vp_architecture(&self, vp_id: u32) -> Result<VirtualProcessorArch, ResultCode> {
+    pub fn get_vp_architecture(&self, vp_id: u32) -> VmSavedStateDumpResult<VirtualProcessorArch> {
         let mut vp_arch = VirtualProcessorArch::Unknown;
         let result: HResult;
 
@@ -220,7 +222,7 @@ impl VmSavedStateDumpProvider {
         vp_id: u32,
         arch: VirtualProcessorArch,
         register_id: RegisterRawId,
-    ) -> Result<VirtualProcessorRegister, ResultCode> {
+    ) -> VmSavedStateDumpResult<VirtualProcessorRegister> {
         let mut vp_register_value: VirtualProcessorRegister = VirtualProcessorRegister {
             architecture: arch,
             value: 0,
@@ -239,7 +241,7 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns a virtual processor paging mode.
-    pub fn get_vp_paging_mode(&self, vp_id: u32) -> Result<PagingMode, ResultCode> {
+    pub fn get_vp_paging_mode(&self, vp_id: u32) -> VmSavedStateDumpResult<PagingMode> {
         let mut vp_paging_mode = PagingMode::Invalid;
         let result: HResult;
 
@@ -258,7 +260,7 @@ impl VmSavedStateDumpProvider {
         &self,
         physical_address: GuestPhysicalAddress,
         buffer: &mut [u8],
-    ) -> Result<u32, ResultCode> {
+    ) -> VmSavedStateDumpResult<u32> {
         let buffer_size = buffer.len() as u32;
         let buffer_ptr = buffer.as_mut_ptr();
         let mut bytes_read: u32 = 0;
@@ -286,7 +288,7 @@ impl VmSavedStateDumpProvider {
         &self,
         vp_id: u32,
         virtual_address: GuestVirtualAddress,
-    ) -> Result<GuestPhysicalAddress, ResultCode> {
+    ) -> VmSavedStateDumpResult<GuestPhysicalAddress> {
         let mut physical_address: GuestPhysicalAddress = 0;
         let result: HResult;
 
@@ -306,7 +308,7 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns a tuple with the page size and the layout of the physical memory of the guest.
-    pub fn guest_physical_memory_chunks(&self) -> Result<(u64, Vec<GpaMemoryChunk>), ResultCode> {
+    pub fn guest_physical_memory_chunks(&self) -> VmSavedStateDumpResult<(u64, Vec<GpaMemoryChunk>)> {
         let mut memory_chunks: Vec<GpaMemoryChunk> = vec![];
         let mut page_size: u64 = 0;
         let mut chunk_count: u64 = 0;
@@ -354,7 +356,7 @@ impl VmSavedStateDumpProvider {
     pub fn guest_physical_address_to_raw_saved_memory_offset(
         &self,
         physical_address: GuestPhysicalAddress,
-    ) -> Result<u64, ResultCode> {
+    ) -> VmSavedStateDumpResult<u64> {
         let mut raw_saved_memory_offset: u64 = 0;
         let result: HResult;
 
@@ -378,7 +380,7 @@ impl VmSavedStateDumpProvider {
         &self,
         offset: u64,
         buffer: &mut [u8],
-    ) -> Result<u32, ResultCode> {
+    ) -> VmSavedStateDumpResult<u32> {
         let buffer_size = buffer.len() as u32;
         let buffer_ptr = buffer.as_mut_ptr();
         let mut bytes_read: u32 = 0;
@@ -401,7 +403,7 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns the size in bytes of the saved memory for a given VM saved state file.
-    pub fn guest_raw_saved_memory_size(&self) -> Result<u64, ResultCode> {
+    pub fn guest_raw_saved_memory_size(&self) -> VmSavedStateDumpResult<u64> {
         let mut raw_memory_size: u64 = 0;
         let result: HResult;
 
@@ -458,7 +460,7 @@ impl<'a> VirtualProcessor<'a> {
     }
 
     /// Returns the architecture of a given virtual processor.
-    pub fn architecture(&self) -> Result<VirtualProcessorArch, ResultCode> {
+    pub fn architecture(&self) -> VmSavedStateDumpResult<VirtualProcessorArch> {
         self.provider.get_vp_architecture(self.id)
     }
 
@@ -467,13 +469,13 @@ impl<'a> VirtualProcessor<'a> {
         &self,
         arch: VirtualProcessorArch,
         register_id: RegisterRawId,
-    ) -> Result<VirtualProcessorRegister, ResultCode> {
+    ) -> VmSavedStateDumpResult<VirtualProcessorRegister> {
         self.provider
             .get_vp_register_value(self.id, arch, register_id)
     }
 
     /// Returns the paging mode of a given virtual processor.
-    pub fn paging_mode(&self) -> Result<PagingMode, ResultCode> {
+    pub fn paging_mode(&self) -> VmSavedStateDumpResult<PagingMode> {
         self.provider.get_vp_paging_mode(self.id)
     }
 }
