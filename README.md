@@ -11,7 +11,7 @@ VmSavedStateDumpProvider APIs are part of the [Windows 10 SDK](https://developer
 
 For this wrapper to build properly, the following requirements need to be met by the building machine:
 
-- Windows 10 SDK version **10.0.17763.132**.
+- Windows 10 SDK version **10.0.18362.0**.
 - **amd64** architecture.
 
 ## Wrapped Windows 10 SDK APIs
@@ -19,10 +19,10 @@ For this wrapper to build properly, the following requirements need to be met by
 **_Note: The file paths are based on the default installation path `c:\Program Files (x86)\Windows Kits\10`._**
 
 The relevant Windows 10 SDK files that this project is wrapping are:
-- C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\vmsavedstatedumpdefs.h
-- C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\um\vmsavedstatedump.h
-- C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\um\x64\vmsavedstatedumpprovider.lib
-- C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\vmsavedstatedumpprovider.dll
+- C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\vmsavedstatedumpdefs.h
+- C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\vmsavedstatedump.h
+- C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\vmsavedstatedumpprovider.lib
+- C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\vmsavedstatedumpprovider.dll
 
 ## Usage
 
@@ -51,7 +51,7 @@ Clone the repo to a folder:
 git clone https://github.com/rafawo/vmsavedstatetodump-rs.git
 ```
 
-Make sure the machine where you are building has Windows 10 SDK version Windows 10 SDK version **10.0.17763.132** installed. Then run:
+Make sure the machine where you are building has Windows 10 SDK version Windows 10 SDK version **10.0.18362.0** installed. Then run:
 
 ```
 cd vmsavedstatetodump-rs
@@ -70,5 +70,4 @@ cargo test
 
 **NOTE:There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
 saved state files from being loaded in sequence, reusing the same handle.
-A fix has been made, but won't be in until the next official release of the windows 10 SDK.
-As a workaround, a private fix can be found in https://1drv.ms/u/s!ArJxuNplQduwr8V4AuAELz2KE6SLvQ**
+The fix is available starting at Windows 10 SDK version 10.0.18362.0
