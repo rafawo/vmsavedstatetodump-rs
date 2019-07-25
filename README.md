@@ -68,6 +68,30 @@ Finally, the build process should have copied `vmsavedstatedumpprovider.dll` to 
 cargo test
 ```
 
-**NOTE:There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
+> **NOTE:There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
 saved state files from being loaded in sequence, reusing the same handle.
-The fix is available starting at Windows 10 SDK version 10.0.18362.0
+The fix is available starting at Windows 10 SDK version 10.0.18362.0**
+
+## Crates.io version notes
+
+This section briefly describes notes regarding each published crates.io version of this project.
+
+Ordered from latest to oldest.
+
+- [**0.1.3 Dec 20, 2018**](https://crates.io/crates/vmsavedstatedump_rs/0.1.3)
+  - Cleaned up types and error handling.
+  - Internal refactoring and added type aliases for windows types.
+  - *****NOT A RECOMMENDED VERSION TO USE. IT MIGHT BE YANKED IN THE FUTURE*****
+    - This is the last crate version with a hardcoded dependency to Windows 10 SDK 10.0.17763.0, which unfortunately has the broken vmsavedstatedumpprovider.dll version.
+- [**0.1.2 Dec 20, 2018**](https://crates.io/crates/vmsavedstatedump_rs/0.1.2)
+  - Completed the core implementation of the library
+  - Added integration tests.
+  - Added note to README regarding the broken version of vmsavedstatedumpprovider.dll, and a link to a private fix.
+  - *****NOT A RECOMMENDED VERSION TO USE. IT MIGHT BE YANKED IN THE FUTURE*****
+- [**0.1.1 Dec 14, 2018**](https://crates.io/crates/vmsavedstatedump_rs/0.1.1)
+  - Minor bug fixes but still missing core functionality.
+  - *****NOT A RECOMMENDED VERSION TO USE. IT MIGHT BE YANKED IN THE FUTURE*****
+- [**0.1.0 Dec 14, 2018**](https://crates.io/crates/vmsavedstatedump_rs/0.1.0)
+  - First version released for this crate.
+  - Contains the basic bindings and rust abstractions to the API but still has a lot of bugs.
+  - *****NOT A RECOMMENDED VERSION TO USE. IT MIGHT BE YANKED IN THE FUTURE*****
