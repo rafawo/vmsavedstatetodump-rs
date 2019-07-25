@@ -78,6 +78,9 @@ This section briefly describes notes regarding each published crates.io version 
 
 Ordered from latest to oldest.
 
+- [**0.2.0 Dec 20, 2018**](https://crates.io/crates/vmsavedstatedump_rs/0.2.0)
+  - Updated default Windows 10 SDK version to 10.0.18362.0
+    - This removes the need of using a private vmsavedstatedumpprovider.dll and the one in the SDK contains the fix to the multiple opened files at the same time on a single loaded DLL module.
 - [**0.1.3 Dec 20, 2018**](https://crates.io/crates/vmsavedstatedump_rs/0.1.3)
   - Cleaned up types and error handling.
   - Internal refactoring and added type aliases for windows types.
