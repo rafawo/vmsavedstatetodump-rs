@@ -6,7 +6,6 @@
 // except according to those terms.
 // THE SOURCE CODE IS AVAILABLE UNDER THE ABOVE CHOSEN LICENSE "AS IS", WITH NO WARRANTIES.
 
-
 //! There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
 //! saved state files from being loaded in sequence, reusing the same handle.
 //!

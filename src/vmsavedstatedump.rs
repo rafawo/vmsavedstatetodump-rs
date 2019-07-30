@@ -67,7 +67,9 @@ pub fn locate_saved_state_files(
 
         result = LocateSavedStateFiles(
             widestring::WideCString::from_str(vm_name).unwrap().as_ptr(),
-            widestring::WideCString::from_str(snapshot_name).unwrap().as_ptr(),
+            widestring::WideCString::from_str(snapshot_name)
+                .unwrap()
+                .as_ptr(),
             &mut bin_file_path_buffer as *mut LPWStr,
             &mut vsv_file_path_buffer as *mut LPWStr,
             &mut vmrs_file_path_buffer as *mut LPWStr,
@@ -108,7 +110,9 @@ pub fn apply_pending_replay_log(vmrs: &str) -> VmSavedStateDumpResult<()> {
     let result: HResult;
 
     unsafe {
-        result = ApplyPendingSavedStateFileReplayLog(widestring::WideCString::from_str(vmrs).unwrap().as_ptr())
+        result = ApplyPendingSavedStateFileReplayLog(
+            widestring::WideCString::from_str(vmrs).unwrap().as_ptr(),
+        )
     }
 
     match hresult_to_result_code(&result) {
@@ -308,7 +312,9 @@ impl VmSavedStateDumpProvider {
     }
 
     /// Returns a tuple with the page size and the layout of the physical memory of the guest.
-    pub fn guest_physical_memory_chunks(&self) -> VmSavedStateDumpResult<(u64, Vec<GpaMemoryChunk>)> {
+    pub fn guest_physical_memory_chunks(
+        &self,
+    ) -> VmSavedStateDumpResult<(u64, Vec<GpaMemoryChunk>)> {
         let mut memory_chunks: Vec<GpaMemoryChunk> = vec![];
         let mut page_size: u64 = 0;
         let mut chunk_count: u64 = 0;
