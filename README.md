@@ -74,9 +74,7 @@ The fix is available starting at Windows 10 SDK version 10.0.18362.0**
 
 ## Crates.io version notes
 
-This section briefly describes notes regarding each published crates.io version of this project.
-
-Ordered from latest to oldest.
+This section briefly describes all published crates.io [versions](https://crates.io/crates/vmsavedstatedump_rs/versions) of this project, ordered from latest to oldest.
 
 - [**0.2.0 Jul 25, 2019**](https://crates.io/crates/vmsavedstatedump_rs/0.2.0)
   - Updated default Windows 10 SDK version to 10.0.18362.0
