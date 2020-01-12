@@ -1,17 +1,10 @@
-// Copyright © rafawo (rafawo1@hotmail.com). All rights reserved.
+// Copyright (c) 2019 Rafael Alcaraz Mercado. All rights reserved.
 // Licensed under the Apache License, Version 2.0
 // <LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 // <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your option.
 // All files in the project carrying such notice may not be copied, modified, or distributed
 // except according to those terms.
 // THE SOURCE CODE IS AVAILABLE UNDER THE ABOVE CHOSEN LICENSE "AS IS", WITH NO WARRANTIES.
-
-//! There is a bug in vmsavedstatedumpprovider.dll that prevents multiple
-//! saved state files from being loaded in sequence, reusing the same handle.
-//!
-//! A fix has been made, but won't be in until the next official release of the windows 10 SDK.
-//! As a workaround, a private fix can be found in https://1drv.ms/u/s!ArJxuNplQduwr8V4AuAELz2KE6SLvQ
-//!
 
 use std::path::{Path, PathBuf};
 use vmsavedstatedump_rs::vmsavedstatedump::*;
