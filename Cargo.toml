@@ -18,8 +18,9 @@ exclude = [
 [features]
 # Include all features by default, since it provides the full Rust
 # abstractions for vmsavedstatedump windows support
-default = ["mindumpdef"]
+default = ["mindumpdef", "SDK_v2004"]
 mindumpdef = []
+SDK_v2004 = []
 
 
 [dependencies]

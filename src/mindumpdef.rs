@@ -6,7 +6,6 @@
 // except according to those terms.
 // THE SOURCE CODE IS AVAILABLE UNDER THE ABOVE CHOSEN LICENSE "AS IS", WITH NO WARRANTIES.
 
-
 //! This module provides a Rust equivalent of Windows SDK's `mindumpdef.h` header file.
 
 pub const DMP_PHYSICAL_MEMORY_BLOCK_SIZE_32: usize = 700;
@@ -30,7 +29,7 @@ pub enum DumpTypes {
     Triage = 4,
     BitmapFull = 5,
     BitmapKernel = 6,
-    Automatic = 7
+    Automatic = 7,
 }
 
 pub const DUMP_SIGNATURE32: &[u8] = b"EGAP";
@@ -55,7 +54,6 @@ pub struct PhysicalMemoryRun32 {
     pub page_count: u32,
 }
 
-
 #[repr(C)]
 #[derive(Copy, Clone, Default)]
 pub struct PhysicalMemoryDescriptor32 {
@@ -63,7 +61,6 @@ pub struct PhysicalMemoryDescriptor32 {
     pub number_of_pages: u32,
     pub run: [PhysicalMemoryRun32; 1],
 }
-
 
 #[repr(C)]
 #[derive(Copy, Clone, Default)]
@@ -79,7 +76,6 @@ pub struct PhysicalMemoryDescriptor64 {
     pub number_of_pages: u64,
     pub run: [PhysicalMemoryRun64; 1],
 }
-
 
 #[repr(C)]
 #[derive(Copy, Clone, Default)]
@@ -277,7 +273,6 @@ pub struct DumpHeader32 {
     pub suite_mask: u32,
     pub writer_status: u32,
 
-
     /// Present for Win2k and better.
     pub required_dump_space: winapi::shared::ntdef::LARGE_INTEGER,
 
@@ -304,11 +299,17 @@ impl DumpHeader32 {
     }
 
     pub fn physical_memory_block(&self) -> &PhysicalMemoryDescriptor32 {
-        unsafe { &(*((&self.physical_memory_block_buffer as *const _) as *const PhysicalMemoryDescriptor32)) }
+        unsafe {
+            &(*((&self.physical_memory_block_buffer as *const _)
+                as *const PhysicalMemoryDescriptor32))
+        }
     }
 
     pub fn physical_memory_block_mut(&mut self) -> &mut PhysicalMemoryDescriptor32 {
-        unsafe { &mut (*((&mut self.physical_memory_block_buffer as *mut _) as *mut PhysicalMemoryDescriptor32)) }
+        unsafe {
+            &mut (*((&mut self.physical_memory_block_buffer as *mut _)
+                as *mut PhysicalMemoryDescriptor32))
+        }
     }
 }
 
@@ -371,10 +372,16 @@ impl DumpHeader64 {
     }
 
     pub fn physical_memory_block(&self) -> &PhysicalMemoryDescriptor64 {
-        unsafe { &(*((&self.physical_memory_block_buffer as *const _) as *const PhysicalMemoryDescriptor64)) }
+        unsafe {
+            &(*((&self.physical_memory_block_buffer as *const _)
+                as *const PhysicalMemoryDescriptor64))
+        }
     }
 
     pub fn physical_memory_block_mut(&mut self) -> &mut PhysicalMemoryDescriptor64 {
-        unsafe { &mut (*((&mut self.physical_memory_block_buffer as *mut _) as *mut PhysicalMemoryDescriptor64)) }
+        unsafe {
+            &mut (*((&mut self.physical_memory_block_buffer as *mut _)
+                as *mut PhysicalMemoryDescriptor64))
+        }
     }
 }

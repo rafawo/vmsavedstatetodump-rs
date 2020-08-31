@@ -220,6 +220,41 @@ impl VmSavedStateDumpProvider {
         }
     }
 
+    /// Sets the virtual processor architecture.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn set_vp_architecture(
+        &self,
+        vp_id: u32,
+        architecture: VirtualProcessorArch,
+    ) -> VmSavedStateDumpResult<()> {
+        let result: HResult;
+
+        unsafe {
+            result = ForceArchitecture(self.handle, vp_id, architecture);
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success => Ok(()),
+            error => Err(error),
+        }
+    }
+
+    /// Queries if a given virtual processor is in kernel space.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn is_vp_in_kernel_space(&self, vp_id: u32) -> VmSavedStateDumpResult<bool> {
+        let result: HResult;
+        let mut in_kernel_space: u32 = 0;
+
+        unsafe {
+            result = InKernelSpace(self.handle, vp_id, &mut in_kernel_space);
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success => Ok(in_kernel_space != 0),
+            error => Err(error),
+        }
+    }
+
     /// Returns a virtual processor register value.
     pub fn get_vp_register_value(
         &self,
@@ -255,6 +290,25 @@ impl VmSavedStateDumpProvider {
 
         match hresult_to_result_code(&result) {
             ResultCode::Success => Ok(vp_paging_mode),
+            error => Err(error),
+        }
+    }
+
+    /// Sets a virtual processor paging mode.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn set_vp_paging_mode(
+        &self,
+        vp_id: u32,
+        paging_mode: PagingMode,
+    ) -> VmSavedStateDumpResult<()> {
+        let result: HResult;
+
+        unsafe {
+            result = ForcePagingMode(self.handle, vp_id, paging_mode);
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success => Ok(()),
             error => Err(error),
         }
     }
@@ -422,6 +476,44 @@ impl VmSavedStateDumpProvider {
             error => Err(error),
         }
     }
+
+    /// Sets the memory block cache limit for a saved state file. By default this is 0.
+    /// A VmSavedStateDump provider instance reads from the saved state file in a memory block basis.
+    /// Setting a memory block cache limit will make the instance cache in-memory blocks read from the
+    /// file, which is useful for performance.
+    /// Setting the limit back to 0 discards all cached memory blocks.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn set_memory_block_cacke_limit(
+        &self,
+        memory_block_cache_limit: u64,
+    ) -> VmSavedStateDumpResult<()> {
+        let result: HResult;
+
+        unsafe {
+            result = SetMemoryBlockCacheLimit(self.handle, memory_block_cache_limit);
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success => Ok(()),
+            error => Err(error),
+        }
+    }
+
+    /// Returns the memory block cache limit for a saved state file.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn get_memory_block_cacke_limit(&self) -> VmSavedStateDumpResult<u64> {
+        let result: HResult;
+        let mut memory_block_cache_limit: u64 = 0;
+
+        unsafe {
+            result = GetMemoryBlockCacheLimit(self.handle, &mut memory_block_cache_limit);
+        }
+
+        match hresult_to_result_code(&result) {
+            ResultCode::Success => Ok(memory_block_cache_limit),
+            error => Err(error),
+        }
+    }
 }
 
 /// Represents a virtual processor of a VmSavedStateDumpProvider
@@ -470,6 +562,21 @@ impl<'a> VirtualProcessor<'a> {
         self.provider.get_vp_architecture(self.id)
     }
 
+    /// Sets the architecture of a given virtual processor.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn set_architecture(
+        &mut self,
+        architecture: VirtualProcessorArch,
+    ) -> VmSavedStateDumpResult<()> {
+        self.provider.set_vp_architecture(self.id, architecture)
+    }
+
+    /// Returns whether the virtual processor is in kernel space or not.
+    #[cfg(feature = "SDK_v2004")]
+    pub fn in_kernel_space(&self) -> VmSavedStateDumpResult<bool> {
+        self.provider.is_vp_in_kernel_space(self.id)
+    }
+
     /// Returns the register value of a given virtual processor.
     pub fn register_value(
         &self,
@@ -483,5 +590,10 @@ impl<'a> VirtualProcessor<'a> {
     /// Returns the paging mode of a given virtual processor.
     pub fn paging_mode(&self) -> VmSavedStateDumpResult<PagingMode> {
         self.provider.get_vp_paging_mode(self.id)
+    }
+
+    /// Sets the paging mode of a given virtual processor.
+    pub fn set_paging_mode(&self, paging_mode: PagingMode) -> VmSavedStateDumpResult<()> {
+        self.provider.set_vp_paging_mode(self.id, paging_mode)
     }
 }

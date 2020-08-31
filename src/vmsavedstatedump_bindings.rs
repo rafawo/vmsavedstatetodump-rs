@@ -143,6 +143,44 @@ extern "C" {
         Architecture: *mut VirtualProcessorArch,
     ) -> HResult;
 
+    /// Forces the current Architecture/ISA of a given virtual processor.
+    /// This is useful to force architecture specific virtual to physical address translation techniques.
+    ///
+    /// # Arguments
+    ///
+    /// * `VmSavedStateDumpHandle` - Supplies a handle to a dump provider instance.
+    /// * `VpId` - Supplies the VP to force the architecure on.
+    /// * `Architecture` - Supplies the architecture to force on the vp.
+    ///
+    /// # Returns
+    ///
+    /// * `HResult`.
+    ///
+    #[cfg(feature = "SDK_v2004")]
+    pub fn ForceArchitecture(
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        VpId: u32,
+        Architecture: VirtualProcessorArch,
+    ) -> HResult;
+
+    /// Queries if a given VP is in kernel space.
+    ///
+    /// # Arguments
+    /// * `VmSavedStateDumpHandle` - Supplies a handle to a dump provider instance.
+    /// * `VpId` - Supplies the VP to query.
+    /// * `InKernelSpace` - Returns if the VP is in kernel space.
+    ///
+    /// # Returns
+    ///
+    /// * `HResult`.
+    ///
+    #[cfg(feature = "SDK_v2004")]
+    pub fn InKernelSpace(
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        VpId: u32,
+        InKernelSpace: *mut u32,
+    ) -> HResult;
+
     /// Queries for a specific register value for a given VP in a VmSavedStateDump.
     /// Callers must specify architecture and register ID in parameter Register, and this function
     /// returns the register value through it.
@@ -180,6 +218,26 @@ extern "C" {
         VmSavedStateDumpHandle: VmSavedStateDumpHandle,
         VpId: u32,
         PagingMode: *mut PagingMode,
+    ) -> HResult;
+
+    /// Forces the Paging Mode for a given virtual processor.
+    /// This is useful to force paging mode specific virtual to physical address translation techniques.
+    ///
+    /// # Arguments
+    ///
+    /// * `VmSavedStateDumpHandle` - Supplies a handle to a dump provider instance.
+    /// * `VpId` - Supplies the Virtual Processor Id.
+    /// * `PagingMode` - Supplies the paging mode to force on the virtual processor.
+    ///
+    /// # Returns
+    ///
+    /// * `HResult`.
+    ///
+    #[cfg(feature = "SDK_v2004")]
+    pub fn ForcePagingMode(
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        VpId: u32,
+        PagingMode: PagingMode,
     ) -> HResult;
 
     /// Reads from the saved state file the given guest physical address range and then
@@ -314,4 +372,41 @@ extern "C" {
         GuestRawSavedMemorySize: *mut u64,
     ) -> HResult;
 
+    /// Sets the memory block cache limit for a saved state file. By default this is 0.
+    /// A VmSavedStateDump provider instance reads from the saved state file in a memory block basis.
+    /// Setting a memory block cache limit will make the instance cache in-memory blocks read from the
+    /// file, which is useful for performance.
+    /// Setting the limit back to 0 discards all cached memory blocks.
+    ///
+    /// # Arguments
+    ///
+    /// * `VmSavedStateDumpHandle` - Supplies a handle to a dump provider instance.
+    /// * `MemoryBlockCacheLimit` - Supplies the memory block cache limit to set.
+    ///
+    /// # Returns
+    ///
+    /// * `HResult`.
+    ///
+    #[cfg(feature = "SDK_v2004")]
+    pub fn SetMemoryBlockCacheLimit(
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        MemoryBlockCacheLimit: u64,
+    ) -> HResult;
+
+    /// Returns the memory block cache limit for a saved state file.
+    ///
+    /// # Arguments
+    ///
+    /// * `VmSavedStateDumpHandle` - Supplies a handle to a dump provider instance.
+    /// * `MemoryBlockCacheLimit` - Returns the memory block cache limit.
+    ///
+    /// # Returns
+    ///
+    /// * `HResult`.
+    ///
+    #[cfg(feature = "SDK_v2004")]
+    pub fn GetMemoryBlockCacheLimit(
+        VmSavedStateDumpHandle: VmSavedStateDumpHandle,
+        MemoryBlockCacheLimit: *mut u64,
+    ) -> HResult;
 }
