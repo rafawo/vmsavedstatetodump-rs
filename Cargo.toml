@@ -15,6 +15,13 @@ exclude = [
     "vmsavedstatedumpprovider.pdb",
 ]
 
+[features]
+# Include all features by default, since it provides the full Rust
+# abstractions for vmsavedstatedump windows support
+default = ["mindumpdef"]
+mindumpdef = []
+
+
 [dependencies]
 widestring = "0.4.0"
 winapi = { version = "0.3.6", features =  ["winbase"] }

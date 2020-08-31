@@ -32,6 +32,9 @@ pub mod vmsavedstatedump;
 pub(crate) mod vmsavedstatedump_bindings;
 pub mod vmsavedstatedumpdefs;
 
+#[cfg(feature = "mindumpdef")]
+pub mod mindumpdef;
+
 /// Module that declares aliases to windows definitions used by this crate
 /// using Rust's naming conventions.
 pub(crate) mod windefs {
